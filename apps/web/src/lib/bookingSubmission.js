@@ -1,11 +1,25 @@
 const trimTrailingSlash = (value = '') => value.replace(/\/+$/, '');
 
+const normalizeApiBaseUrl = (value = '/api') => {
+  const trimmed = trimTrailingSlash(value || '/api');
+
+  if (!trimmed) {
+    return '/api';
+  }
+
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('/')) {
+    return trimmed;
+  }
+
+  return `/${trimmed.replace(/^\.?\/+/, '')}`;
+};
+
 const rawApiBase =
   import.meta.env.VITE_API_BASE_URL ||
   import.meta.env.VITE_API_URL ||
   '/api';
 
-const apiBaseUrl = trimTrailingSlash(rawApiBase);
+const apiBaseUrl = normalizeApiBaseUrl(rawApiBase);
 const hasReachableApiBase =
   apiBaseUrl &&
   !/localhost|127\.0\.0\.1/i.test(apiBaseUrl);

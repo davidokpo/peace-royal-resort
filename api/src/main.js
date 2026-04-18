@@ -29,7 +29,14 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({
+    limit: '50mb',
+    verify: (req, res, buf) => {
+        if (buf?.length) {
+            req.rawBody = Buffer.from(buf);
+        }
+    },
+}));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Health Check for Vercel
