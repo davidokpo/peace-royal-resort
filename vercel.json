@@ -1,10 +1,9 @@
 {
   "version": 2,
-  "public": true,
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/apps/api/src/main.js"
+      "destination": "/api/src/main.js"
     },
     {
       "source": "/(.*)",
