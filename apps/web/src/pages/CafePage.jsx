@@ -17,6 +17,7 @@ import MediaSlideshow from '@/components/MediaSlideshow.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
+import { redirectToCheckout } from '@/lib/paymentCheckout.js';
 
 const CafePage = () => {
   const navigate = useNavigate();
@@ -120,10 +121,22 @@ const CafePage = () => {
         fallbackRecord: orderData,
       });
 
-      navigate('/success', { state: { order: submission.record, submissionMode: submission.mode } });
+      if (submission.mode === 'local_backup') {
+        navigate('/payment-success', { state: { order: submission.record, submissionMode: submission.mode } });
+        return;
+      }
+
+      await redirectToCheckout({
+        amount: total,
+        bookingId: submission.record.id,
+        productName: isFriday ? 'Cafe order and game night' : 'Cafe order',
+        customerEmail: formData.email,
+        state: { order: submission.record, submissionMode: submission.mode },
+      });
     } catch (error) {
       console.error(error);
       toast.error(error.message || 'Order failed. Please try again.');
+    } finally {
       setLoading(false);
     }
   };

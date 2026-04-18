@@ -15,6 +15,7 @@ import MediaSlideshow from '@/components/MediaSlideshow.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
+import { redirectToCheckout } from '@/lib/paymentCheckout.js';
 
 const RoomsPage = () => {
   const navigate = useNavigate();
@@ -75,19 +76,25 @@ const RoomsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const nights = calculateNights();
     if (nights <= 0) {
       toast.error('Check-out date must be after check-in date.');
       return;
     }
 
+    if (!formData.identity_document) {
+      toast.error('Please upload your identity document.');
+      return;
+    }
+
     setLoading(true);
 
     try {
+      const totalPrice = calculateTotal();
       const requestData = {
         ...formData,
-        total_price: calculateTotal(),
+        total_price: totalPrice,
         type: 'room',
         identity_document_name: formData.identity_document?.name || 'No file uploaded'
       };
@@ -107,7 +114,22 @@ const RoomsPage = () => {
           : 'Booking saved. Please contact the hotel to confirm while online sync is being connected.',
       );
 
-      navigate('/success', {
+      if (submission.mode === 'local_backup') {
+        navigate('/payment-success', {
+          state: {
+            booking: submission.record,
+            submissionMode: submission.mode,
+            message: 'Your sanctuary at Peace Royal is reserved.',
+          },
+        });
+        return;
+      }
+
+      await redirectToCheckout({
+        amount: totalPrice,
+        bookingId: submission.record.id,
+        productName: `${formData.room_type} booking`,
+        customerEmail: formData.email,
         state: {
           booking: submission.record,
           submissionMode: submission.mode,
@@ -116,7 +138,7 @@ const RoomsPage = () => {
       });
     } catch (error) {
       console.error('Submission error:', error);
-      toast.error('Network Error: Could not reach the server. Please check your connection.');
+      toast.error('Checkout could not be started. Please try again.');
     } finally {
       setLoading(false);
     }

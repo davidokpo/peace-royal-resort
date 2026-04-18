@@ -16,6 +16,7 @@ import MediaSlideshow from '@/components/MediaSlideshow.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
+import { redirectToCheckout } from '@/lib/paymentCheckout.js';
 
 const GardenBookingPage = () => {
   const navigate = useNavigate();
@@ -60,10 +61,22 @@ const GardenBookingPage = () => {
         fallbackRecord: bookingPayload,
       });
 
-      navigate('/success', { state: { booking: submission.record, submissionMode: submission.mode } });
+      if (submission.mode === 'local_backup') {
+        navigate('/payment-success', { state: { booking: submission.record, submissionMode: submission.mode } });
+        return;
+      }
+
+      await redirectToCheckout({
+        amount: PACKAGE_PRICE,
+        bookingId: submission.record.id,
+        productName: `${formData.event_type || 'Garden'} booking`,
+        customerEmail: formData.customer_email,
+        state: { booking: submission.record, submissionMode: submission.mode },
+      });
     } catch (error) {
       console.error(error);
       toast.error(error.message || 'Booking failed. Please try again.');
+    } finally {
       setLoading(false);
     }
   };

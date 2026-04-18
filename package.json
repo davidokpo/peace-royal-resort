@@ -5,6 +5,7 @@
   "version": "0.0.0",
 
   "private": true,
+  "packageManager": "pnpm@10.33.0",
 
   "scripts": {
     "dev": "concurrently --kill-others --raw \"npm run dev --workspace apps/web\" \"npm run dev --workspace api\"",

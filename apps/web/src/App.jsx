@@ -24,10 +24,13 @@ function App() {
         <Route path="/cafe" element={<CafePage />} />
         <Route path="/wellness" element={<WellnessPage />} />
         <Route path="/garden" element={<GardenBookingPage />} />
+        <Route path="/garden-booking" element={<GardenBookingPage />} />
         <Route path="/balcony-booking" element={<BalconyBookingPage />} />
         <Route path="/balcony" element={<BalconyBookingPage />} /> {/* Alias for link ease */}
         <Route path="/success" element={<PaymentSuccess />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/cancel" element={<PaymentCancel />} />
+        <Route path="/payment-cancel" element={<PaymentCancel />} />
         <Route path="*" element={
           <div className="min-h-screen flex items-center justify-center bg-background">
             <div className="text-center">
