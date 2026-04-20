@@ -34,10 +34,10 @@ const RestaurantPage = () => {
   });
 
   const menuItems = [
-    { id: 1, name: 'Pepper Soup (Goat/Fish)', price: 3800, desc: 'Spicy African delicacy for evening hangouts.', img: '/assets/images/menu-pepper-soup.svg', highlight: true },
-    { id: 2, name: 'Jollof Rice with Chicken', price: 3500, desc: 'Classic spicy Nigerian jollof with grilled chicken.', img: '/assets/images/menu-jollof-rice.svg' },
-    { id: 3, name: 'Egusi Soup & Pounded Yam', price: 4200, desc: 'Traditional melon seed soup with smooth pounded yam.', img: '/assets/images/menu-egusi-pounded-yam.svg' },
-    { id: 4, name: 'Suya Platter', price: 2800, desc: 'Spicy grilled beef skewers with onions and peppers.', img: '/assets/images/menu-suya-platter.svg' },
+    { id: 1, name: 'Pepper Soup (Goat/Fish)', price: 3800, desc: 'Spicy African delicacy for evening hangouts.', img: '/assets/images/Pepper Soup (GoatFish).jpg', highlight: true },
+    { id: 2, name: 'Jollof Rice with Chicken', price: 3500, desc: 'Classic spicy Nigerian jollof with grilled chicken.', img: '/assets/images/Jollof Rice with Chicken.jpg' },
+    { id: 3, name: 'Egusi Soup & Pounded Yam', price: 4200, desc: 'Traditional melon seed soup with smooth pounded yam.', img: '/assets/images/Egusi Soup & Pounded Yam.jpg' },
+    { id: 4, name: 'Suya Platter', price: 2800, desc: 'Spicy grilled beef skewers with onions and peppers.', img: '/assets/images/Suya Platter.jpg' },
   ];
 
   const breakfastPackages = [
@@ -176,7 +176,7 @@ const RestaurantPage = () => {
                     <h3 className="font-bold text-lg mb-2 text-foreground">{item.name}</h3>
                     <p className="text-sm text-muted-foreground mb-4 flex-grow">{item.desc}</p>
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/20">
-                      <span className="font-bold text-secondary">₦{item.price.toLocaleString()}</span>
+                      <span className="font-bold text-secondary">N{item.price.toLocaleString()}</span>
                       <div className="flex items-center gap-3 bg-white/40 rounded-full px-2 py-1">
                         <button onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white/50 rounded-full transition-colors"><Minus className="w-4 h-4" /></button>
                         <span className="text-sm font-medium w-4 text-center">{cart[item.id] || 0}</span>
@@ -201,7 +201,7 @@ const RestaurantPage = () => {
                     <h3 className="font-bold text-lg mb-3">{pkg.name}</h3>
                     <p className="text-sm text-muted-foreground mb-6 h-10">{pkg.desc}</p>
                     <div className="flex flex-col items-center justify-between mt-auto gap-4">
-                      <span className="font-bold text-xl">₦{pkg.price.toLocaleString()}</span>
+                      <span className="font-bold text-xl">N{pkg.price.toLocaleString()}</span>
                       <div className="flex items-center gap-3 bg-secondary/10 rounded-full px-4 py-2 w-full justify-center">
                         <button onClick={() => updateCart(pkg, -1)} className="p-1 hover:bg-secondary/20 rounded-full"><Minus className="w-4 h-4" /></button>
                         <span className="font-medium w-8 text-center">{cart[pkg.id] || 0}</span>
@@ -284,7 +284,7 @@ const RestaurantPage = () => {
                 <div className="border-t border-border pt-6">
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-lg font-medium text-foreground">Total Order Value:</span>
-                    <span className="text-2xl font-bold text-secondary">₦{calculateTotal().toLocaleString()}</span>
+                    <span className="text-2xl font-bold text-secondary">N{calculateTotal().toLocaleString()}</span>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     <Button
@@ -322,3 +322,4 @@ const RestaurantPage = () => {
 };
 
 export default RestaurantPage;
+

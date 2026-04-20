@@ -49,9 +49,7 @@ const CafePage = () => {
     { id: 8, category: 'Pastry', name: 'Meat Pie', price: 1500, img: '/assets/images/restaurant-main.svg', desc: 'Flaky pastry with a rich savory meat filling.' },
     { id: 9, category: 'Pastry', name: 'Chicken Pie', price: 1700, img: '/assets/images/restaurant-main.svg', desc: 'Buttery pastry filled with seasoned chicken.' },
     { id: 10, category: 'Pastry', name: 'Fish Pie', price: 1500, img: '/assets/images/restaurant-main.svg', desc: 'Golden pastry stuffed with a savory fish filling.' },
-    { id: 11, category: 'Pastry', name: '2 Samosa', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Two crisp triangular pastries with a spicy savory center.' },
-    { id: 12, category: 'Pastry', name: '2 Spring Rolls', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Two light crunchy rolls for easy snacking.' },
-    { id: 13, category: 'Pastry', name: 'Puff-puff', price: 800, img: '/assets/images/restaurant-main.svg', desc: 'Soft fried dough bites, warm and sweet.' },
+    { id: 11, category: 'Snack', name: 'Small Chops', price: 3500, img: '/assets/images/restaurant-main.svg', desc: 'A mixed tray of crisp samosa, spring rolls, and puff-puff for easy sharing.' },
     { id: 14, category: 'Pastry', name: 'Doughnut', price: 800, img: '/assets/images/restaurant-main.svg', desc: 'Classic soft doughnut for a quick sweet break.' },
     { id: 15, category: 'Snack', name: 'Club Sandwich', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Layered sandwich for a fuller cafe meal.' },
     { id: 16, category: 'Breakfast', name: 'Pancake', price: 500, img: '/assets/images/restaurant-main.svg', desc: 'Soft fresh pancake served warm.' },
@@ -103,7 +101,7 @@ const CafePage = () => {
     }
     const total = calculateTotal();
     if (isFriday && total < 3000) {
-      toast.error('Friday Game Night requires a minimum order of ₦3,000 to reserve a table.');
+      toast.error('Friday Game Night requires a minimum order of N3,000 to reserve a table.');
       return;
     }
 
@@ -214,7 +212,7 @@ const CafePage = () => {
                             <p className="mt-2 text-sm text-white/70">{item.desc}</p>
                           </div>
                           <div className="flex justify-between items-center mt-auto">
-                          <span className="font-medium text-white/90">₦{item.price.toLocaleString()}</span>
+                          <span className="font-medium text-white/90">N{item.price.toLocaleString()}</span>
                           <div className="flex items-center gap-2 bg-black/20 rounded-full px-2 py-1">
                             <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white/20 rounded-full"><Minus className="w-3 h-3" /></button>
                             <span className="text-sm font-medium w-4 text-center">{cart[item.id] || 0}</span>
@@ -244,7 +242,7 @@ const CafePage = () => {
                             <p className="mt-2 text-sm text-white/70">{item.desc}</p>
                           </div>
                           <div className="mt-auto flex items-center justify-between gap-3">
-                            <span className="font-medium text-white/90">â‚¦{item.price.toLocaleString()}</span>
+                            <span className="font-medium text-white/90">N{item.price.toLocaleString()}</span>
                             <div className="flex items-center gap-2 bg-black/20 rounded-full px-2 py-1">
                               <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white/20 rounded-full"><Minus className="w-3 h-3" /></button>
                               <span className="text-sm font-medium w-4 text-center">{cart[item.id] || 0}</span>
@@ -417,4 +415,6 @@ const CafePage = () => {
 };
 
 export default CafePage;
+
+
 
