@@ -19,6 +19,7 @@ const breakfastPackages = [
 const BalconyBookingForm = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [submitMode, setSubmitMode] = useState('reserve');
   const [formData, setFormData] = useState({
     guest_name: '',
     email: '',
@@ -37,9 +38,11 @@ const BalconyBookingForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const action = e.nativeEvent?.submitter?.value || submitMode;
     setLoading(true);
 
     try {
+      const paymentMethod = action === 'pay' ? 'pay_online' : 'pay_on_ground';
       const totalPrice = getSelectedPackagePrice();
       const bookingData = {
         guest_name: formData.guest_name,
@@ -50,6 +53,7 @@ const BalconyBookingForm = () => {
         breakfast_package: formData.breakfast_package,
         guest_count: formData.guest_count,
         special_requests: formData.special_requests,
+        payment_method: paymentMethod,
         booking_status: 'pending',
         payment_status: 'pending',
         total_price: totalPrice
@@ -64,7 +68,7 @@ const BalconyBookingForm = () => {
         fallbackRecord: bookingData,
       });
 
-      if (mode === 'local_backup') {
+      if (mode === 'local_backup' || action === 'reserve') {
         navigate('/payment-success', { state: { booking: record, submissionMode: mode } });
         return;
       }
@@ -219,16 +223,43 @@ const BalconyBookingForm = () => {
         )}
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-200 active:scale-[0.98]">
-        {loading ? (
-          <>
-            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-            Processing booking...
-          </>
-        ) : (
-          'Submit Booking Request'
-        )}
-      </Button>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Button
+          type="submit"
+          name="submission_action"
+          value="reserve"
+          disabled={loading}
+          variant="outline"
+          onClick={() => setSubmitMode('reserve')}
+          className="w-full transition-all duration-200 active:scale-[0.98]"
+        >
+          {loading && submitMode === 'reserve' ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            'Pay on Ground'
+          )}
+        </Button>
+        <Button
+          type="submit"
+          name="submission_action"
+          value="pay"
+          disabled={loading}
+          onClick={() => setSubmitMode('pay')}
+          className="w-full bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-200 active:scale-[0.98]"
+        >
+          {loading && submitMode === 'pay' ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            'Pay Online'
+          )}
+        </Button>
+      </div>
     </form>
   );
 };

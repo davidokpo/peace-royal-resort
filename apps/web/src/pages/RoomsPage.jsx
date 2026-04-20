@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Wifi, Tv, Wind, Coffee, ShieldCheck, Upload, Loader2, BedDouble } from 'lucide-react';
+import { ShieldCheck, Upload, Loader2, BedDouble } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,9 +17,12 @@ import { HOTEL_IMAGES } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout.js';
 
+const VAT_RATE = 0.075;
+
 const RoomsPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [submitMode, setSubmitMode] = useState('reserve');
   const [formData, setFormData] = useState({
     guest_name: '',
     email: '',
@@ -28,7 +31,7 @@ const RoomsPage = () => {
     check_out_date: '',
     room_type: '',
     special_requests: '',
-    identity_document: null
+    identity_document: null,
   });
 
   const rooms = [
@@ -39,22 +42,26 @@ const RoomsPage = () => {
       image: HOTEL_IMAGES.roomExecutive,
       media: [
         { src: HOTEL_IMAGES.roomExecutive, alt: 'Executive suite photo' },
-        { src: '/assets/images/executive_room.MOV', alt: 'Executive suite video tour' }
+        {
+          src: '/assets/images/executive_room.MOV',
+          alt: 'Executive suite video tour',
+          startAt: 12,
+          endAt: 24,
+          poster: HOTEL_IMAGES.roomExecutive,
+        },
       ],
       desc: 'Spacious luxury with premium amenities, perfect for extended stays.',
-      amenities: ['Orthopedic bed', 'Smart TV (Netflix)', 'Elegant room finish', 'High-speed WiFi']
+      amenities: ['Orthopedic bed', 'Smart TV (Netflix)', 'Elegant room finish', 'High-speed WiFi', 'Laundry service', 'Complimentary breakfast'],
     },
     {
       id: 'deluxe',
       name: 'Deluxe Room',
       price: 25000,
       image: HOTEL_IMAGES.roomDeluxe,
-      media: [
-        { src: HOTEL_IMAGES.roomDeluxe, alt: 'Deluxe room photo' }
-      ],
+      media: [{ src: HOTEL_IMAGES.roomDeluxe, alt: 'Deluxe room photo' }],
       desc: 'Comfortable, elegant, and designed for deep rest.',
-      amenities: ['Orthopedic bed', 'Smart TV', 'Work desk', 'High-speed WiFi']
-    }
+      amenities: ['Orthopedic bed', 'Smart TV', 'Work desk', 'High-speed WiFi', 'Complimentary breakfast'],
+    },
   ];
 
   const handleFileChange = (e) => {
@@ -68,14 +75,19 @@ const RoomsPage = () => {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
-  const calculateTotal = () => {
+  const calculateSubtotal = () => {
     const nights = calculateNights();
     const roomPrice = formData.room_type === 'Executive Suite' ? 30000 : formData.room_type === 'Deluxe Room' ? 25000 : 0;
     return nights * roomPrice;
   };
 
+  const calculateTax = () => Math.round(calculateSubtotal() * VAT_RATE);
+
+  const calculateTotal = () => calculateSubtotal() + calculateTax();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const action = e.nativeEvent?.submitter?.value || submitMode;
 
     const nights = calculateNights();
     if (nights <= 0) {
@@ -91,12 +103,20 @@ const RoomsPage = () => {
     setLoading(true);
 
     try {
-      const totalPrice = calculateTotal();
+      const paymentMethod = action === 'pay' ? 'pay_online' : 'pay_on_ground';
+      const subtotalPrice = calculateSubtotal();
+      const taxAmount = calculateTax();
+      const totalPrice = subtotalPrice + taxAmount;
       const requestData = {
         ...formData,
+        subtotal_price: subtotalPrice,
+        tax_rate: VAT_RATE,
+        tax_amount: taxAmount,
         total_price: totalPrice,
         type: 'room',
-        identity_document_name: formData.identity_document?.name || 'No file uploaded'
+        payment_method: paymentMethod,
+        complimentary_breakfast: true,
+        identity_document_name: formData.identity_document?.name || 'No file uploaded',
       };
 
       const submission = await submitBookingRequest({
@@ -114,7 +134,7 @@ const RoomsPage = () => {
           : 'Booking saved. Please contact the hotel to confirm while online sync is being connected.',
       );
 
-      if (submission.mode === 'local_backup') {
+      if (submission.mode === 'local_backup' || action === 'reserve') {
         navigate('/payment-success', {
           state: {
             booking: submission.record,
@@ -152,7 +172,7 @@ const RoomsPage = () => {
   return (
     <>
       <Helmet>
-        <title>Rooms — Peace Royal Resort</title>
+        <title>Rooms - Peace Royal Resort</title>
       </Helmet>
 
       <div className="min-h-screen bg-[#D9C5B2]/20 organic-pattern">
@@ -168,12 +188,14 @@ const RoomsPage = () => {
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Minimalist spaces designed for profound rest and relaxation.
               </p>
+              <p className="mt-3 text-sm font-medium text-primary">
+                Full room booking comes with complimentary breakfast. VAT is shown at 7.5%.
+              </p>
             </div>
 
-            {/* Room Listing */}
             <div className="space-y-12 mb-24">
               {rooms.map((room, idx) => (
-                <motion.div 
+                <motion.div
                   key={room.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -184,7 +206,7 @@ const RoomsPage = () => {
                   <div className="md:w-1/2 h-64 md:h-auto relative">
                     <MediaSlideshow items={room.media} className="h-full w-full" />
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-primary shadow-sm">
-                      ₦{room.price.toLocaleString()} / night
+                      N{room.price.toLocaleString()} / night
                     </div>
                   </div>
                   <div className="md:w-1/2 p-8 flex flex-col justify-center">
@@ -198,9 +220,12 @@ const RoomsPage = () => {
                         </div>
                       ))}
                     </div>
-                    <Button 
+                    <p className="mb-6 text-sm font-medium text-primary">
+                      Complimentary breakfast is included with every full room booking.
+                    </p>
+                    <Button
                       onClick={() => {
-                        setFormData(prev => ({ ...prev, room_type: room.name }));
+                        setFormData((prev) => ({ ...prev, room_type: room.name }));
                         document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth' });
                       }}
                       className="w-fit bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl px-8"
@@ -212,8 +237,7 @@ const RoomsPage = () => {
               ))}
             </div>
 
-            {/* Unified Booking Form */}
-            <motion.div 
+            <motion.div
               id="booking-form"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -224,40 +248,47 @@ const RoomsPage = () => {
                 <BedDouble className="w-10 h-10 mx-auto text-primary mb-4" />
                 <h2 className="heading-font text-3xl font-bold text-foreground">Secure Your Booking</h2>
                 <p className="text-muted-foreground">Submit your stay request and our team will confirm the next step.</p>
+                <p className="mt-2 text-sm font-medium text-primary">
+                  VAT is shown below at 7.5%, and full room bookings include complimentary breakfast.
+                </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="guest_name">Full Name</Label>
-                    <Input id="guest_name" required value={formData.guest_name} onChange={(e) => setFormData({...formData, guest_name: e.target.value})} className="bg-white/50 border-white/60" />
+                    <Input id="guest_name" required value={formData.guest_name} onChange={(e) => setFormData({ ...formData, guest_name: e.target.value })} className="bg-white/50 border-white/60" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="bg-white/50 border-white/60" />
+                    <Input id="email" type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-white/50 border-white/60" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="bg-white/50 border-white/60" />
+                    <Input id="phone" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-white/50 border-white/60" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="room_type">Room Type</Label>
-                    <Select value={formData.room_type} onValueChange={(val) => setFormData({...formData, room_type: val})} required>
+                    <Select value={formData.room_type} onValueChange={(val) => setFormData({ ...formData, room_type: val })} required>
                       <SelectTrigger className="bg-white/50 border-white/60 text-gray-900">
                         <SelectValue placeholder="Select room type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {rooms.map(r => <SelectItem key={r.id} value={r.name}>{r.name} (₦{r.price.toLocaleString()})</SelectItem>)}
+                        {rooms.map((r) => (
+                          <SelectItem key={r.id} value={r.name}>
+                            {r.name} (N{r.price.toLocaleString()})
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="check_in_date">Check-in Date</Label>
-                    <Input id="check_in_date" type="date" required min={new Date().toISOString().split('T')[0]} value={formData.check_in_date} onChange={(e) => setFormData({...formData, check_in_date: e.target.value})} className="bg-white/50 border-white/60" />
+                    <Input id="check_in_date" type="date" required min={new Date().toISOString().split('T')[0]} value={formData.check_in_date} onChange={(e) => setFormData({ ...formData, check_in_date: e.target.value })} className="bg-white/50 border-white/60" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="check_out_date">Check-out Date</Label>
-                    <Input id="check_out_date" type="date" required min={formData.check_in_date || new Date().toISOString().split('T')[0]} value={formData.check_out_date} onChange={(e) => setFormData({...formData, check_out_date: e.target.value})} className="bg-white/50 border-white/60" />
+                    <Input id="check_out_date" type="date" required min={formData.check_in_date || new Date().toISOString().split('T')[0]} value={formData.check_out_date} onChange={(e) => setFormData({ ...formData, check_out_date: e.target.value })} className="bg-white/50 border-white/60" />
                   </div>
                 </div>
 
@@ -275,14 +306,26 @@ const RoomsPage = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="special_requests">Special Requests (Optional)</Label>
-                  <Textarea id="special_requests" value={formData.special_requests} onChange={(e) => setFormData({...formData, special_requests: e.target.value})} className="bg-white/50 border-white/60" rows={3} placeholder="Any specific needs for your stay?" />
+                  <Textarea id="special_requests" value={formData.special_requests} onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })} className="bg-white/50 border-white/60" rows={3} placeholder="Any specific needs for your stay?" />
                 </div>
 
                 {calculateNights() > 0 && formData.room_type && (
                   <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-muted-foreground">{calculateNights()} nights × {formData.room_type}</span>
-                      <span className="font-bold text-foreground">₦{calculateTotal().toLocaleString()}</span>
+                      <span className="text-muted-foreground">{calculateNights()} nights x {formData.room_type}</span>
+                      <span className="font-bold text-foreground">N{calculateSubtotal().toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-2 text-sm">
+                      <span className="text-muted-foreground">VAT (7.5%)</span>
+                      <span className="font-semibold text-foreground">N{calculateTax().toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-2 text-sm">
+                      <span className="text-muted-foreground">Complimentary breakfast</span>
+                      <span className="font-semibold text-primary">Included</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 mb-2 border-t border-primary/10">
+                      <span className="font-semibold text-foreground">Estimated total</span>
+                      <span className="font-bold text-foreground">N{calculateTotal().toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm text-muted-foreground">
                       <span className="flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Booking request stored securely</span>
@@ -290,9 +333,29 @@ const RoomsPage = () => {
                   </div>
                 )}
 
-                <Button type="submit" disabled={loading} className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground py-6 text-lg rounded-xl transition-all">
-                  {loading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Submit Booking Request'}
-                </Button>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Button
+                    type="submit"
+                    name="submission_action"
+                    value="reserve"
+                    disabled={loading}
+                    variant="outline"
+                    onClick={() => setSubmitMode('reserve')}
+                    className="w-full py-6 text-lg rounded-xl transition-all"
+                  >
+                    {loading && submitMode === 'reserve' ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Pay on Ground'}
+                  </Button>
+                  <Button
+                    type="submit"
+                    name="submission_action"
+                    value="pay"
+                    disabled={loading}
+                    onClick={() => setSubmitMode('pay')}
+                    className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground py-6 text-lg rounded-xl transition-all"
+                  >
+                    {loading && submitMode === 'pay' ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Pay Online'}
+                  </Button>
+                </div>
               </form>
             </motion.div>
           </div>

@@ -22,6 +22,7 @@ const GardenBookingPage = () => {
   const navigate = useNavigate();
   const [isNightMode, setIsNightMode] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitMode, setSubmitMode] = useState('reserve');
   
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -39,8 +40,10 @@ const GardenBookingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const action = e.nativeEvent?.submitter?.value || submitMode;
     setLoading(true);
     try {
+      const paymentMethod = action === 'pay' ? 'pay_online' : 'pay_on_ground';
       const bookingPayload = {
         clientBookingRef: crypto.randomUUID(),
         customerName: formData.customer_name,
@@ -52,16 +55,20 @@ const GardenBookingPage = () => {
         preferredTime: formData.preferred_time,
         specialRequests: formData.special_requests,
         catering: formData.catering,
+        payment_method: paymentMethod,
         totalPrice: PACKAGE_PRICE,
       };
 
       const submission = await submitBookingRequest({
-        endpoint: '/bookings/create',
-        payload: bookingPayload,
+        endpoint: '/bookings/intake',
+        payload: {
+          bookingType: 'garden',
+          data: bookingPayload,
+        },
         fallbackRecord: bookingPayload,
       });
 
-      if (submission.mode === 'local_backup') {
+      if (submission.mode === 'local_backup' || action === 'reserve') {
         navigate('/payment-success', { state: { booking: submission.record, submissionMode: submission.mode } });
         return;
       }
@@ -90,9 +97,9 @@ const GardenBookingPage = () => {
     title: 'Spice & Cinema',
     desc: 'Pepper soup, outdoor movie nights under the stars.',
     media: [
-      { src: '/assets/images/garden-booking-night.mp4', alt: 'Night garden cinema experience' },
-      { src: '/assets/images/garden-filmshow.mp4', alt: 'Outdoor film show in the garden' },
-      { src: '/assets/images/garden-events.mp4', alt: 'Evening garden event setup' },
+      { src: '/assets/images/garden-booking-night.mp4', alt: 'Night garden cinema experience', startAt: 10, endAt: 20 },
+      { src: '/assets/images/garden-filmshow.mp4', alt: 'Outdoor film show in the garden', startAt: 10, endAt: 20 },
+      { src: '/assets/images/garden-events.mp4', alt: 'Evening garden event setup', startAt: 10, endAt: 20 },
       { src: HOTEL_IMAGES.gardenBookingNight, alt: 'Nighttime garden booking view' },
     ],
     bg: 'bg-[#2D4C3E]',
@@ -103,9 +110,9 @@ const GardenBookingPage = () => {
     media: [
       { src: HOTEL_IMAGES.gardenDay, alt: 'Garden daytime photo' },
       { src: HOTEL_IMAGES.gardenBookingDay, alt: 'Garden day booking view' },
-      { src: '/assets/images/IMG_7555.MOV', alt: 'Garden daytime atmosphere video' },
-      { src: '/assets/images/garden-games.mp4', alt: 'Garden games and hangout moment' },
-      { src: '/assets/images/garden-events.mp4', alt: 'Garden event in daylight' },
+      { src: '/assets/images/IMG_7555.MOV', alt: 'Garden daytime atmosphere video', startAt: 10, endAt: 20 },
+      { src: '/assets/images/garden-games.mp4', alt: 'Garden games and hangout moment', startAt: 10, endAt: 20 },
+      { src: '/assets/images/garden-events.mp4', alt: 'Garden event in daylight', startAt: 10, endAt: 20 },
     ],
     bg: 'bg-[#D9C5B2]',
     text: 'text-[#2D4C3E]'
@@ -239,9 +246,29 @@ const GardenBookingPage = () => {
                     <Textarea rows={3} value={formData.special_requests} onChange={e=>setFormData({...formData, special_requests: e.target.value})} className="bg-white/50 mt-1" />
                   </div>
 
-                  <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white h-14 rounded-xl text-lg font-medium">
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Submit Event Request'}
-                  </Button>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Button
+                      type="submit"
+                      name="submission_action"
+                      value="reserve"
+                      disabled={loading}
+                      variant="outline"
+                      onClick={() => setSubmitMode('reserve')}
+                      className="w-full h-14 rounded-xl text-lg font-medium bg-white/10 text-white border-white/20 hover:bg-white/15"
+                    >
+                      {loading && submitMode === 'reserve' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay on Ground'}
+                    </Button>
+                    <Button
+                      type="submit"
+                      name="submission_action"
+                      value="pay"
+                      disabled={loading}
+                      onClick={() => setSubmitMode('pay')}
+                      className="w-full bg-primary hover:bg-primary/90 text-white h-14 rounded-xl text-lg font-medium"
+                    >
+                      {loading && submitMode === 'pay' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay Online'}
+                    </Button>
+                  </div>
                 </form>
               </div>
             </div>

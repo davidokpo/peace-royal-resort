@@ -10,6 +10,36 @@ const getMediaType = (src = '') => {
   return 'image';
 };
 
+const getVideoWindowMs = (slide) => {
+  const startAt = Number(slide?.startAt ?? 0);
+  const endAt = Number(slide?.endAt ?? 0);
+
+  if (endAt > startAt) {
+    return Math.max(3000, (endAt - startAt) * 1000);
+  }
+
+  return 8000;
+};
+
+const getVideoSrc = (slide) => {
+  if (!slide?.src) {
+    return '';
+  }
+
+  const startAt = Number(slide?.startAt ?? 0);
+  const endAt = Number(slide?.endAt ?? 0);
+
+  if (endAt > startAt) {
+    return `${slide.src}#t=${startAt},${endAt}`;
+  }
+
+  if (startAt > 0) {
+    return `${slide.src}#t=${startAt}`;
+  }
+
+  return slide.src;
+};
+
 const MediaSlideshow = ({
   items,
   className = '',
@@ -30,7 +60,7 @@ const MediaSlideshow = ({
     }
 
     const activeSlide = slides[activeIndex];
-    const timeoutMs = getMediaType(activeSlide?.src) === 'video' ? 8000 : 5000;
+    const timeoutMs = getMediaType(activeSlide?.src) === 'video' ? getVideoWindowMs(activeSlide) : 5000;
     const timer = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
     }, timeoutMs);
@@ -58,12 +88,14 @@ const MediaSlideshow = ({
       {mediaType === 'video' ? (
         <video
           key={activeSlide.src}
-          src={activeSlide.src}
+          src={getVideoSrc(activeSlide)}
           className="h-full w-full object-cover"
           autoPlay
           muted
           loop
           playsInline
+          preload="metadata"
+          poster={activeSlide.poster}
         />
       ) : (
         <img
@@ -71,6 +103,8 @@ const MediaSlideshow = ({
           src={activeSlide.src}
           alt={activeSlide.alt}
           className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
       )}
 

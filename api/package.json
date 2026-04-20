@@ -16,6 +16,7 @@
     "googleapis": "^171.4.0",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
+    "nodemailer": "^7.0.10",
     "pocketbase": "^0.26.8"
   },
   "devDependencies": {

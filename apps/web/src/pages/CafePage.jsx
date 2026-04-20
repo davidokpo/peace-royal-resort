@@ -23,6 +23,7 @@ const CafePage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [cart, setCart] = useState({});
+  const [submitMode, setSubmitMode] = useState('ground');
   const [isFriday, setIsFriday] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -37,23 +38,40 @@ const CafePage = () => {
     game_time_slot: ''
   });
 
-  const beverages = [
-    { id: 1, name: 'Chamomile Tea', price: 1200, night: true },
-    { id: 2, name: 'Artisan Espresso', price: 1000 },
-    { id: 3, name: 'Matcha Latte', price: 1800 },
-    { id: 4, name: 'Fresh Green Smoothie', price: 2500 }
+  const cafeItems = [
+    { id: 1, category: 'Signature Tea', name: 'Bubble Tea', price: 3000, img: '/assets/images/menu-green-smoothie.svg', desc: 'Creamy chilled tea with a playful textured finish.' },
+    { id: 2, category: 'Signature Tea', name: 'Green Tea', price: 1200, img: '/assets/images/menu-matcha-latte.svg', desc: 'Clean and calming tea for a light midday reset.' },
+    { id: 3, category: 'Signature Tea', name: 'Evening Paradise Tea / Peace Royal Resort Special', price: 2500, img: '/assets/images/menu-chamomile-tea.svg', desc: 'Our house evening tea blend crafted for deep calm and slow nights.', night: true },
+    { id: 4, category: 'Signature Tea', name: 'Flavored Tea', price: 1800, img: '/assets/images/menu-chamomile-tea.svg', desc: 'Infused with lemon, honey, or fruit flavors.' },
+    { id: 5, category: 'Coffee', name: 'Artisan Espresso', price: 1000, img: '/assets/images/menu-artisan-espresso.svg', desc: 'Bold short coffee for focused work blocks.' },
+    { id: 6, category: 'Tea Latte', name: 'Matcha Latte', price: 1800, img: '/assets/images/menu-matcha-latte.svg', desc: 'Earthy green tea latte with a smooth finish.' },
+    { id: 7, category: 'Fresh Blend', name: 'Fresh Green Smoothie', price: 2500, img: '/assets/images/menu-green-smoothie.svg', desc: 'Cold blended greens and fruit for a clean lift.' },
+    { id: 8, category: 'Pastry', name: 'Meat Pie', price: 1500, img: '/assets/images/restaurant-main.svg', desc: 'Flaky pastry with a rich savory meat filling.' },
+    { id: 9, category: 'Pastry', name: 'Chicken Pie', price: 1700, img: '/assets/images/restaurant-main.svg', desc: 'Buttery pastry filled with seasoned chicken.' },
+    { id: 10, category: 'Pastry', name: 'Fish Pie', price: 1500, img: '/assets/images/restaurant-main.svg', desc: 'Golden pastry stuffed with a savory fish filling.' },
+    { id: 11, category: 'Pastry', name: '2 Samosa', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Two crisp triangular pastries with a spicy savory center.' },
+    { id: 12, category: 'Pastry', name: '2 Spring Rolls', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Two light crunchy rolls for easy snacking.' },
+    { id: 13, category: 'Pastry', name: 'Puff-puff', price: 800, img: '/assets/images/restaurant-main.svg', desc: 'Soft fried dough bites, warm and sweet.' },
+    { id: 14, category: 'Pastry', name: 'Doughnut', price: 800, img: '/assets/images/restaurant-main.svg', desc: 'Classic soft doughnut for a quick sweet break.' },
+    { id: 15, category: 'Snack', name: 'Club Sandwich', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Layered sandwich for a fuller cafe meal.' },
+    { id: 16, category: 'Breakfast', name: 'Pancake', price: 500, img: '/assets/images/restaurant-main.svg', desc: 'Soft fresh pancake served warm.' },
+    { id: 17, category: 'Breakfast', name: 'Pancake with Topping', price: 700, img: '/assets/images/restaurant-main.svg', desc: 'Warm pancake finished with your topping.' },
+    { id: 18, category: 'Breakfast', name: '6 Pancakes with Topping', price: 4000, img: '/assets/images/restaurant-main.svg', desc: 'A full pack of six pancakes with topping for sharing.' },
   ];
 
   const workspaceMedia = [
-    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe workspace video' },
-    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe event energy' },
-    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe games video' },
+    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe workspace video', startAt: 10, endAt: 20 },
+    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe event energy', startAt: 12, endAt: 22 },
+    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe games video', startAt: 10, endAt: 20 },
   ];
 
+  const featuredCafeItems = cafeItems.slice(0, 8);
+  const secondaryCafeItems = cafeItems.slice(8);
+
   const gameNightMedia = [
-    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe game night video' },
-    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe group gaming clip' },
-    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe social workspace event video' },
+    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe game night video', startAt: 10, endAt: 20 },
+    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe group gaming clip', startAt: 12, endAt: 22 },
+    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe social workspace event video', startAt: 10, endAt: 20 },
   ];
 
   const updateCart = (item, delta) => {
@@ -71,13 +89,14 @@ const CafePage = () => {
 
   const calculateTotal = () => {
     return Object.entries(cart).reduce((total, [id, qty]) => {
-      const item = beverages.find(i => String(i.id) === String(id));
+      const item = cafeItems.find(i => String(i.id) === String(id));
       return total + (item ? item.price * qty : 0);
     }, 0);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const action = e.nativeEvent?.submitter?.value || submitMode;
     if (Object.keys(cart).length === 0) {
       toast.error('Add items to order.');
       return;
@@ -90,8 +109,9 @@ const CafePage = () => {
 
     setLoading(true);
     try {
+      const paymentMethod = action === 'online' ? 'pay_online' : 'pay_on_ground';
       const orderItems = Object.entries(cart).map(([id, qty]) => {
-        const item = beverages.find(i => String(i.id) === String(id));
+        const item = cafeItems.find(i => String(i.id) === String(id));
         return { id: item.id, name: item.name, price: item.price, quantity: qty };
       });
 
@@ -104,6 +124,7 @@ const CafePage = () => {
         special_requests: formData.special_requests || 'None',
         delivery_type: isFriday ? 'pickup' : formData.delivery_type,
         order_status: 'pending',
+        payment_method: paymentMethod,
         total_price: total,
         friday_game_night: isFriday,
         board_game_selection: isFriday ? formData.board_game_selection : '',
@@ -121,13 +142,19 @@ const CafePage = () => {
         fallbackRecord: orderData,
       });
 
-      if (submission.mode === 'local_backup') {
+      if (submission.mode === 'local_backup' && paymentMethod === 'pay_online') {
+        toast.error('Payment is unavailable right now. Your order was not confirmed.');
+        return;
+      }
+
+      if (paymentMethod === 'pay_on_ground') {
         navigate('/payment-success', { state: { order: submission.record, submissionMode: submission.mode } });
         return;
       }
 
       const checkout = await startCheckoutOrShowPending({
         navigate,
+        requirePayment: true,
         amount: total,
         bookingId: submission.record.id,
         productName: isFriday ? 'Cafe order and game night' : 'Cafe order',
@@ -136,7 +163,7 @@ const CafePage = () => {
       });
 
       if (!checkout.started) {
-        toast.warning('Your request was saved, but payment could not be started automatically. Please contact the hotel to complete payment.');
+        toast.error(checkout.error?.message || 'Payment could not be started. Please try again.');
       }
     } catch (error) {
       console.error(error);
@@ -166,22 +193,33 @@ const CafePage = () => {
                   <Laptop className="w-12 h-12 text-[#D9C5B2] mb-6" />
                   <h1 className="heading-font text-5xl md:text-6xl font-bold mb-4">Your Workspace.<br/>Your Vibe.</h1>
                   <p className="text-lg text-white/80 max-w-lg leading-relaxed mb-8">
-                    Remote work, creative sessions, or just a quiet corner. Fuel your flow with artisanal beverages in a serene, distraction-free environment.
+                    Remote work, creative sessions, or just a quiet corner. Fuel your flow with signature teas, pastries, and light bites in a serene, distraction-free environment.
                   </p>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {beverages.map(item => (
-                      <div key={item.id} className={`bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 flex flex-col justify-between ${item.night ? 'ring-1 ring-[#7FFF00]/50 neon-green' : ''}`}>
-                        <div className="flex justify-between items-start mb-4">
-                          <h3 className="font-semibold text-white">{item.name}</h3>
-                          {item.night && <Moon className="w-4 h-4 text-[#7FFF00]" />}
+                    {featuredCafeItems.map(item => (
+                      <div key={item.id} className={`bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 flex flex-col justify-between ${item.night ? 'ring-1 ring-[#7FFF00]/50 neon-green' : ''}`}>
+                        <div className="relative h-40">
+                          <img src={item.img} alt={item.name} className="h-full w-full object-cover" loading="lazy" />
+                          {item.night && (
+                            <div className="absolute right-3 top-3 rounded-full bg-black/45 p-2">
+                              <Moon className="w-4 h-4 text-[#7FFF00]" />
+                            </div>
+                          )}
                         </div>
-                        <div className="flex justify-between items-center mt-auto">
+                        <div className="flex flex-1 flex-col p-5">
+                          <div className="mb-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">{item.category}</p>
+                            <h3 className="font-semibold text-white">{item.name}</h3>
+                            <p className="mt-2 text-sm text-white/70">{item.desc}</p>
+                          </div>
+                          <div className="flex justify-between items-center mt-auto">
                           <span className="font-medium text-white/90">₦{item.price.toLocaleString()}</span>
                           <div className="flex items-center gap-2 bg-black/20 rounded-full px-2 py-1">
                             <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white/20 rounded-full"><Minus className="w-3 h-3" /></button>
                             <span className="text-sm font-medium w-4 text-center">{cart[item.id] || 0}</span>
                             <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-white/20 rounded-full"><Plus className="w-3 h-3 text-[#FFB84D]" /></button>
+                          </div>
                           </div>
                         </div>
                       </div>
@@ -189,8 +227,34 @@ const CafePage = () => {
                   </div>
                 </motion.div>
                 
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} className="h-[500px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10">
-                  <MediaSlideshow items={workspaceMedia} className="h-full w-full" />
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} className="space-y-5">
+                  <div className="h-[500px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10">
+                    <MediaSlideshow items={workspaceMedia} className="h-full w-full" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {secondaryCafeItems.map(item => (
+                      <div key={item.id} className={`bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 flex flex-col justify-between ${item.night ? 'ring-1 ring-[#7FFF00]/50 neon-green' : ''}`}>
+                        <div className="relative h-32">
+                          <img src={item.img} alt={item.name} className="h-full w-full object-cover" loading="lazy" />
+                        </div>
+                        <div className="flex flex-1 flex-col p-4">
+                          <div className="mb-3">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/55">{item.category}</p>
+                            <h3 className="font-semibold text-white">{item.name}</h3>
+                            <p className="mt-2 text-sm text-white/70">{item.desc}</p>
+                          </div>
+                          <div className="mt-auto flex items-center justify-between gap-3">
+                            <span className="font-medium text-white/90">â‚¦{item.price.toLocaleString()}</span>
+                            <div className="flex items-center gap-2 bg-black/20 rounded-full px-2 py-1">
+                              <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white/20 rounded-full"><Minus className="w-3 h-3" /></button>
+                              <span className="text-sm font-medium w-4 text-center">{cart[item.id] || 0}</span>
+                              <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-white/20 rounded-full"><Plus className="w-3 h-3 text-[#FFB84D]" /></button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </motion.div>
               </div>
             </div>
@@ -315,9 +379,29 @@ const CafePage = () => {
 
                   <div className="border-t border-border pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div className="text-lg">Total: <strong className="text-2xl text-primary font-bold">₦{calculateTotal().toLocaleString()}</strong></div>
-                    <Button type="submit" disabled={loading} className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white py-6 px-10 rounded-xl text-lg transition-all active:scale-95">
-                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isFriday ? 'Reserve Table' : 'Submit Order Request')}
-                    </Button>
+                    <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
+                      <Button
+                        type="submit"
+                        name="submission_action"
+                        value="ground"
+                        disabled={loading}
+                        variant="outline"
+                        onClick={() => setSubmitMode('ground')}
+                        className="w-full py-6 px-6 rounded-xl text-lg transition-all active:scale-95"
+                      >
+                        {loading && submitMode === 'ground' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay on Ground'}
+                      </Button>
+                      <Button
+                        type="submit"
+                        name="submission_action"
+                        value="online"
+                        disabled={loading}
+                        onClick={() => setSubmitMode('online')}
+                        className="w-full bg-primary hover:bg-primary/90 text-white py-6 px-6 rounded-xl text-lg transition-all active:scale-95"
+                      >
+                        {loading && submitMode === 'online' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay Online'}
+                      </Button>
+                    </div>
                   </div>
                 </form>
               </div>

@@ -14,8 +14,11 @@ const HomePage = () => {
   return (
     <>
       <Helmet>
-        <title>Home — Peace Royal Resort</title>
-        <meta name="description" content="Experience tranquility and luxury at Peace Royal Resort. Discover nature-inspired minimalism in the heart of Gwarimpa." />
+        <title>Home - Peace Royal Resort</title>
+        <meta
+          name="description"
+          content="Experience tranquility and luxury at Peace Royal Resort. Discover nature-inspired minimalism in the heart of Gwarimpa."
+        />
       </Helmet>
 
       <div className="min-h-screen bg-background organic-pattern">
@@ -23,13 +26,13 @@ const HomePage = () => {
         <SidebarNavigation />
 
         <main className="lg:ml-24 pb-20 lg:pb-0">
-          {/* Hero Section */}
           <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
             <div className="absolute inset-0">
               <img
                 src={HOTEL_IMAGES.homeHero}
                 alt="Peace Royal Resort exterior"
                 className="w-full h-full object-cover object-center"
+                fetchPriority="high"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/65 to-primary/20"></div>
             </div>
@@ -44,7 +47,7 @@ const HomePage = () => {
                 <div className="mb-8">
                   <Logo size="large" lightBg={false} className="origin-left scale-75 md:scale-100" />
                 </div>
-                
+
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-sm mb-6">
                   <Sparkles className="w-4 h-4 text-secondary" />
                   <span>Nature-inspired luxury</span>
@@ -70,35 +73,35 @@ const HomePage = () => {
             </div>
           </section>
 
-          {/* Balcony Breakfast Feature */}
           <section className="py-24 relative overflow-hidden bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  viewport={{ once: true, margin: '-100px' }}
                   transition={{ duration: 0.6 }}
                   className="relative order-2 lg:order-1"
                 >
                   <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl relative z-10">
                     <video
-                      src={HOTEL_IMAGES.homeBalcony}
+                      src={`${HOTEL_IMAGES.homeBalcony}#t=12,24`}
                       className="w-full h-full object-cover"
                       autoPlay
                       muted
                       loop
                       playsInline
+                      preload="metadata"
+                      poster={HOTEL_IMAGES.homeHero}
                     />
                   </div>
-                  {/* Decorative backdrop */}
                   <div className="absolute -inset-4 bg-muted rounded-3xl -z-10 transform translate-x-4 translate-y-6"></div>
                 </motion.div>
 
                 <motion.div
                   initial={{ opacity: 0, x: 30 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  viewport={{ once: true, margin: '-100px' }}
                   transition={{ duration: 0.6 }}
                   className="order-1 lg:order-2"
                 >
@@ -117,7 +120,6 @@ const HomePage = () => {
             </div>
           </section>
 
-          {/* 4-Icon Feature Row */}
           <section className="py-16 bg-muted/30">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -125,11 +127,11 @@ const HomePage = () => {
                   { icon: Tv, title: 'Smart TVs', desc: 'Football & Netflix ready' },
                   { icon: Zap, title: 'Solar Inverter', desc: '24/7 uninterrupted power' },
                   { icon: BedDouble, title: 'Orthopedic Beds', desc: 'Deep, restorative sleep' },
-                  { icon: Plane, title: 'Airport Pickup', desc: 'Seamless arrivals' }
+                  { icon: Plane, title: 'Airport Pickup', desc: 'Seamless arrivals' },
                 ].map((feature, idx) => {
                   const Icon = feature.icon;
                   return (
-                    <motion.div 
+                    <motion.div
                       key={idx}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
@@ -149,7 +151,6 @@ const HomePage = () => {
             </div>
           </section>
 
-          {/* 3-Card Grid */}
           <section className="py-24 organic-pattern">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
@@ -165,7 +166,7 @@ const HomePage = () => {
                 {[
                   { title: 'Sanctuary Rooms', desc: 'Minimalist decor, maximum comfort.', link: '/rooms', bg: 'bg-muted' },
                   { title: 'African Dining', desc: 'Authentic flavors, crafted with love.', link: '/restaurant', bg: 'bg-secondary text-secondary-foreground' },
-                  { title: 'Wellness & Flow', desc: 'Yoga, meditation, and inner peace.', link: '/wellness', bg: 'bg-accent text-accent-foreground' }
+                  { title: 'Wellness & Flow', desc: 'Yoga, meditation, and inner peace.', link: '/wellness', bg: 'bg-accent text-accent-foreground' },
                 ].map((card, idx) => (
                   <motion.div
                     key={idx}
@@ -182,7 +183,6 @@ const HomePage = () => {
                         <Link to={card.link}>Explore</Link>
                       </Button>
                     </div>
-                    {/* Decorative subtle circle */}
                     <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
                   </motion.div>
                 ))}
@@ -190,7 +190,6 @@ const HomePage = () => {
             </div>
           </section>
 
-          {/* Commuter Bag Callout */}
           <section className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
             <div className="absolute inset-0 organic-pattern-dark opacity-50"></div>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">

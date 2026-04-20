@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#324b21"/>
+      <stop offset="100%" stop-color="#a37b39"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <ellipse cx="400" cy="438" rx="220" ry="58" fill="#000" opacity=".18"/>
+  <circle cx="360" cy="300" r="156" fill="#efe9dc"/>
+  <circle cx="360" cy="300" r="135" fill="#8a8f2c"/>
+  <path d="M270 330c52-70 114-98 187-84 15 42 7 86-23 133-65 11-120-5-164-49Z" fill="#506d29"/>
+  <path d="M416 236c18 4 31 15 39 34-29 0-43-11-39-34Z" fill="#d37643"/>
+  <path d="M246 274c24 7 38 19 43 38-29-2-43-14-43-38Z" fill="#f2cc64"/>
+  <ellipse cx="540" cy="320" rx="108" ry="86" fill="#e9e0d0"/>
+  <path d="M510 275c26-24 59-24 90 0 18 16 28 37 28 62 0 47-36 82-88 82-52 0-92-34-92-80 0-27 12-48 62-64Z" fill="#f6f1e6"/>
+  <text x="52" y="82" fill="#f8f0df" font-size="38" font-family="Georgia, serif">Egusi Soup &amp; Pounded Yam</text>
+  <text x="52" y="120" fill="#ebe0b0" font-size="24" font-family="Arial, sans-serif">Melon-seed soup, greens, smooth yam side</text>
+</svg>

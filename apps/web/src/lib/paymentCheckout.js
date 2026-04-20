@@ -35,7 +35,7 @@ export const redirectToCheckout = async ({
       ? `${window.location.origin}/payment-success`
       : '/payment-success';
 
-  const response = await apiServerClient.fetch('/stripe/create-checkout', {
+  const response = await apiServerClient.fetch('/paystack/create-checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -64,9 +64,17 @@ export const redirectToCheckout = async ({
 export const startCheckoutOrShowPending = async ({
   navigate,
   pendingPath = '/payment-success',
+  requirePayment = false,
   ...checkoutArgs
 }) => {
   if (!PAYMENTS_ENABLED) {
+    if (requirePayment) {
+      return {
+        started: false,
+        error: new Error('Payments are currently unavailable'),
+      };
+    }
+
     const successState = {
       ...checkoutArgs.state,
       checkoutStatus: 'disabled',
@@ -85,6 +93,13 @@ export const startCheckoutOrShowPending = async ({
     await redirectToCheckout(checkoutArgs);
     return { started: true };
   } catch (error) {
+    if (requirePayment) {
+      return {
+        started: false,
+        error,
+      };
+    }
+
     const pendingState = {
       ...checkoutArgs.state,
       checkoutStatus: 'pending',

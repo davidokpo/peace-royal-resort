@@ -9,7 +9,9 @@ import { toast } from 'sonner';
 import { submitBookingRequest } from '@/lib/bookingSubmission';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout';
 
-const RoomBookingForm = ({ roomType, price }) => {
+const VAT_RATE = 0.075;
+
+const RoomBookingForm = ({ roomType }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -19,7 +21,7 @@ const RoomBookingForm = ({ roomType, price }) => {
     check_in_date: '',
     check_out_date: '',
     room_type: roomType || '',
-    identity_document: null
+    identity_document: null,
   });
 
   const handleFileChange = (e) => {
@@ -38,11 +40,15 @@ const RoomBookingForm = ({ roomType, price }) => {
     return diffDays;
   };
 
-  const calculateTotal = () => {
+  const calculateSubtotal = () => {
     const nights = calculateNights();
     const roomPrice = formData.room_type === 'Executive Suite' ? 30000 : 25000;
     return nights * roomPrice;
   };
+
+  const calculateTax = () => Math.round(calculateSubtotal() * VAT_RATE);
+
+  const calculateTotal = () => calculateSubtotal() + calculateTax();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,38 +61,36 @@ const RoomBookingForm = ({ roomType, price }) => {
         return;
       }
 
-      const totalPrice = calculateTotal();
+      const subtotalPrice = calculateSubtotal();
+      const taxAmount = calculateTax();
+      const totalPrice = subtotalPrice + taxAmount;
       const uploadNote = formData.identity_document
         ? `Identity document uploaded: ${formData.identity_document.name}`
         : '';
+
+      const requestData = {
+        guest_name: formData.guest_name,
+        email: formData.email,
+        phone: formData.phone,
+        check_in_date: formData.check_in_date,
+        check_out_date: formData.check_out_date,
+        room_type: formData.room_type,
+        booking_status: 'pending',
+        subtotal_price: subtotalPrice,
+        tax_rate: VAT_RATE,
+        tax_amount: taxAmount,
+        total_price: totalPrice,
+        notes: uploadNote,
+        complimentary_breakfast: true,
+      };
 
       const { mode, record } = await submitBookingRequest({
         endpoint: '/bookings/intake',
         payload: {
           bookingType: 'room',
-          data: {
-            guest_name: formData.guest_name,
-            email: formData.email,
-            phone: formData.phone,
-            check_in_date: formData.check_in_date,
-            check_out_date: formData.check_out_date,
-            room_type: formData.room_type,
-            booking_status: 'pending',
-            total_price: totalPrice,
-            notes: uploadNote,
-          },
+          data: requestData,
         },
-        fallbackRecord: {
-          guest_name: formData.guest_name,
-          email: formData.email,
-          phone: formData.phone,
-          check_in_date: formData.check_in_date,
-          check_out_date: formData.check_out_date,
-          room_type: formData.room_type,
-          booking_status: 'pending',
-          total_price: totalPrice,
-          notes: uploadNote,
-        },
+        fallbackRecord: requestData,
       });
 
       if (mode === 'local_backup') {
@@ -121,6 +125,9 @@ const RoomBookingForm = ({ roomType, price }) => {
           <ShieldCheck className="w-5 h-5 text-primary" />
           <span className="font-medium">Submit your stay request now and our team will confirm the booking with you.</span>
         </div>
+        <p className="text-sm font-medium text-primary">
+          Full booking comes with complimentary breakfast. VAT is charged at 7.5%.
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -168,8 +175,8 @@ const RoomBookingForm = ({ roomType, price }) => {
                 <SelectValue placeholder="Select room type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Executive Suite">Executive Suite (₦30,000/night)</SelectItem>
-                <SelectItem value="Deluxe Room">Deluxe Room (₦25,000/night)</SelectItem>
+                <SelectItem value="Executive Suite">Executive Suite (N30,000/night)</SelectItem>
+                <SelectItem value="Deluxe Room">Deluxe Room (N25,000/night)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -208,7 +215,7 @@ const RoomBookingForm = ({ roomType, price }) => {
         </div>
 
         <div>
-          <Label htmlFor="identity_document">Identity verification (NIN/Passport/Driver's License)</Label>
+          <Label htmlFor="identity_document">Identity verification (NIN/Passport/Driver&apos;s License)</Label>
           <div className="mt-2 border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary transition-colors duration-200">
             <input
               id="identity_document"
@@ -236,11 +243,23 @@ const RoomBookingForm = ({ roomType, price }) => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Price per night:</span>
-              <span className="font-semibold text-foreground">₦{formData.room_type === 'Executive Suite' ? '30,000' : '25,000'}</span>
+              <span className="font-semibold text-foreground">N{formData.room_type === 'Executive Suite' ? '30,000' : '25,000'}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Subtotal:</span>
+              <span className="font-semibold text-foreground">N{calculateSubtotal().toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">VAT (7.5%):</span>
+              <span className="font-semibold text-foreground">N{calculateTax().toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Complimentary breakfast:</span>
+              <span className="font-semibold text-primary">Included</span>
             </div>
             <div className="border-t border-border pt-2 flex justify-between">
-              <span className="font-semibold text-foreground">Total amount:</span>
-              <span className="text-xl font-bold text-primary">₦{calculateTotal().toLocaleString()}</span>
+              <span className="font-semibold text-foreground">Estimated total:</span>
+              <span className="text-xl font-bold text-primary">N{calculateTotal().toLocaleString()}</span>
             </div>
           </div>
         )}

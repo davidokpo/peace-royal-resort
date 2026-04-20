@@ -38,6 +38,11 @@ const PaymentSuccess = () => {
     order?.submissionMode ||
     'api';
   const isLocalBackup = submissionMode === 'local_backup';
+  const paymentMethod = booking?.payment_method || order?.payment_method || '';
+  const paymentStatus = booking?.payment_status || order?.payment_status || 'pending';
+  const paidLabel = booking?.paid || order?.paid || (paymentMethod === 'pay_on_ground' ? 'Pay on ground' : paymentStatus === 'paid' ? 'Paid online (Paystack)' : 'Awaiting online payment');
+  const isPayOnGround = paymentMethod === 'pay_on_ground';
+  const isPaidOnline = paymentStatus === 'paid' || Boolean(data?.paymentReference);
 
   const getDetails = () => {
     if (booking?.room_type) {
@@ -49,6 +54,8 @@ const PaymentSuccess = () => {
           { label: 'Check-in', value: new Date(booking.check_in_date).toLocaleDateString() },
           { label: 'Check-out', value: new Date(booking.check_out_date).toLocaleDateString() },
           { label: 'Amount', value: `N${booking.total_price?.toLocaleString()}` },
+          { label: 'Payment method', value: paymentMethod || 'N/A' },
+          { label: 'Paid', value: paidLabel },
         ],
       };
     }
@@ -60,6 +67,8 @@ const PaymentSuccess = () => {
           { label: 'Delivery type', value: order.delivery_type },
           { label: 'Order status', value: order.order_status },
           { label: 'Amount', value: `N${order.total_price?.toLocaleString()}` },
+          { label: 'Payment method', value: paymentMethod || 'N/A' },
+          { label: 'Paid', value: paidLabel },
         ],
       };
     }
@@ -71,6 +80,8 @@ const PaymentSuccess = () => {
           { label: 'Order type', value: order.delivery_type },
           { label: 'Order status', value: order.order_status },
           { label: 'Amount', value: `N${order.total_price?.toLocaleString()}` },
+          { label: 'Payment method', value: paymentMethod || 'N/A' },
+          { label: 'Paid', value: paidLabel },
         ],
       };
     }
@@ -84,6 +95,23 @@ const PaymentSuccess = () => {
           { label: 'Time', value: booking.booking_time },
           { label: 'Participants', value: booking.participants_count },
           { label: 'Amount', value: `N${booking.total_price?.toLocaleString()}` },
+          { label: 'Payment method', value: paymentMethod || 'N/A' },
+          { label: 'Paid', value: paidLabel },
+        ],
+      };
+    }
+    if (booking?.breakfast_package) {
+      return {
+        type: 'Balcony Booking',
+        items: [
+          { label: 'Guest name', value: booking.guest_name },
+          { label: 'Breakfast package', value: booking.breakfast_package },
+          { label: 'Date', value: new Date(booking.booking_date).toLocaleDateString() },
+          { label: 'Time', value: booking.booking_time },
+          { label: 'Guests', value: booking.guest_count },
+          { label: 'Amount', value: `N${booking.total_price?.toLocaleString()}` },
+          { label: 'Payment method', value: paymentMethod || 'N/A' },
+          { label: 'Paid', value: paidLabel },
         ],
       };
     }
@@ -97,11 +125,21 @@ const PaymentSuccess = () => {
           { label: 'Preferred date', value: booking.preferredDate || booking.preferred_date || 'N/A' },
           { label: 'Preferred time', value: booking.preferredTime || booking.preferred_time || 'N/A' },
           { label: 'Amount', value: `N${(booking.totalPrice || booking.total_price || 0).toLocaleString()}` },
+          { label: 'Payment method', value: paymentMethod || 'N/A' },
+          { label: 'Paid', value: paidLabel },
         ],
       };
     }
 
-    return { type: 'Booking', items: [] };
+    return {
+      type: 'Booking',
+      items: paymentMethod
+        ? [
+            { label: 'Payment method', value: paymentMethod },
+            { label: 'Paid', value: paidLabel },
+          ]
+        : [],
+    };
   };
 
   const details = getDetails();
@@ -129,12 +167,16 @@ const PaymentSuccess = () => {
               </div>
 
               <h1 className="heading-font text-3xl md:text-4xl font-bold text-foreground mb-4">
-                {isLocalBackup ? 'Booking request saved' : 'Booking received'}
+                {isLocalBackup ? 'Booking request saved' : isPaidOnline ? 'Payment received' : 'Booking received'}
               </h1>
               <p className="text-lg text-muted-foreground mb-8">
                 {isLocalBackup
                   ? `Your ${details.type.toLowerCase()} has been saved on this device. Please contact the hotel directly to confirm it while the live online booking connection is being completed.`
-                  : `Your ${details.type.toLowerCase()} has been received. Our team will review it and contact you to confirm the next step.`}
+                  : isPaidOnline
+                    ? `Your ${details.type.toLowerCase()} has been received and your online payment has been recorded successfully.`
+                    : isPayOnGround
+                      ? `Your ${details.type.toLowerCase()} has been received. You selected pay on ground, so our team will confirm the cash payment step with you.`
+                      : `Your ${details.type.toLowerCase()} has been received. Our team will review it and contact you to confirm the next step.`}
               </p>
 
               <div className="bg-card rounded-xl p-6 mb-8 text-left">
@@ -174,7 +216,11 @@ const PaymentSuccess = () => {
                     <span>
                       {isLocalBackup
                         ? `Call ${HOTEL_CONTACT.phoneDisplay} or email ${HOTEL_CONTACT.email} so the team can confirm this saved request manually`
-                        : 'Our team will contact you shortly to confirm arrangements and the next step'}
+                        : isPayOnGround
+                          ? 'Our team will contact you shortly to confirm arrangements and where you will complete payment on ground'
+                          : isPaidOnline
+                            ? 'Our team will contact you shortly to confirm arrangements linked to your successful online payment'
+                            : 'Our team will contact you shortly to confirm arrangements and the next step'}
                     </span>
                   </li>
                   <li className="flex items-start gap-2">

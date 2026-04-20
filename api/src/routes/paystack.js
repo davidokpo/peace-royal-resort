@@ -1,3 +1,4 @@
+import '../env.js';
 import crypto from 'node:crypto';
 import express from 'express';
 import logger from '../utils/logger.js';
@@ -5,36 +6,41 @@ import { markBookingPaid } from '../services/bookingService.js';
 
 const router = express.Router();
 const PAYSTACK_BASE_URL = 'https://api.paystack.co';
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || process.env.STRIPE_SECRET_KEY;
-const TRANSFER_RECIPIENT_CODE =
+const getPaystackSecretKey = () => process.env.PAYSTACK_SECRET_KEY || process.env.STRIPE_SECRET_KEY;
+const getTransferRecipientCode = () =>
   process.env.PAYSTACK_TRANSFER_RECIPIENT_CODE ||
   process.env.PAYSTACK_MONIEPOINT_RECIPIENT_CODE ||
   process.env.PAYSTACK_OPAY_RECIPIENT_CODE;
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
+const getAdminApiKey = () => process.env.ADMIN_API_KEY;
 
 const requireAdminKey = (req, res, next) => {
   const supplied = req.headers['x-admin-key'];
-  if (!ADMIN_API_KEY || supplied !== ADMIN_API_KEY) {
+  const adminApiKey = getAdminApiKey();
+
+  if (!adminApiKey || supplied !== adminApiKey) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   return next();
 };
 
 const triggerSettlementTransfer = async ({ amount, bookingId, customerName }) => {
-  if (!TRANSFER_RECIPIENT_CODE || !PAYSTACK_SECRET_KEY) {
+  const paystackSecretKey = getPaystackSecretKey();
+  const transferRecipientCode = getTransferRecipientCode();
+
+  if (!transferRecipientCode || !paystackSecretKey) {
     return;
   }
 
   const transferResponse = await fetch(`${PAYSTACK_BASE_URL}/transfer`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+      Authorization: `Bearer ${paystackSecretKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       source: 'balance',
       amount,
-      recipient: TRANSFER_RECIPIENT_CODE,
+      recipient: transferRecipientCode,
       reason: `Hotel booking payout for ${customerName || bookingId}`,
     }),
   });
@@ -52,7 +58,9 @@ const createTransferRecipient = async (req, res) => {
     return res.status(400).json({ error: 'accountNumber and bankCode are required' });
   }
 
-  if (!PAYSTACK_SECRET_KEY) {
+  const paystackSecretKey = getPaystackSecretKey();
+
+  if (!paystackSecretKey) {
     return res.status(500).json({ error: 'Paystack secret key is not configured on the server' });
   }
 
@@ -61,7 +69,7 @@ const createTransferRecipient = async (req, res) => {
     {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+        Authorization: `Bearer ${paystackSecretKey}`,
       },
     },
   );
@@ -76,7 +84,7 @@ const createTransferRecipient = async (req, res) => {
   const createRecipientResponse = await fetch(`${PAYSTACK_BASE_URL}/transferrecipient`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+      Authorization: `Bearer ${paystackSecretKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -118,14 +126,16 @@ router.post('/create-checkout', async (req, res) => {
       return res.status(400).json({ error: 'productName, successUrl, bookingId and customerEmail are required' });
     }
 
-    if (!PAYSTACK_SECRET_KEY) {
+    const paystackSecretKey = getPaystackSecretKey();
+
+    if (!paystackSecretKey) {
       return res.status(500).json({ error: 'Paystack secret key is not configured on the server' });
     }
 
     const response = await fetch(`${PAYSTACK_BASE_URL}/transaction/initialize`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+        Authorization: `Bearer ${paystackSecretKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -140,10 +150,25 @@ router.post('/create-checkout', async (req, res) => {
       }),
     });
 
-    const payload = await response.json();
+    const responseText = await response.text();
+    let payload = null;
+
+    try {
+      payload = responseText ? JSON.parse(responseText) : null;
+    } catch (parseError) {
+      logger.error('Paystack initialization returned non-JSON:', responseText);
+      return res.status(502).json({
+        error: 'Invalid response from Paystack',
+        detail: responseText?.slice(0, 300) || parseError.message,
+      });
+    }
+
     if (!response.ok || !payload?.status || !payload?.data?.authorization_url) {
       logger.error('Paystack initialization failed:', payload);
-      return res.status(400).json({ error: payload?.message || 'Failed to initialize Paystack checkout' });
+      return res.status(400).json({
+        error: payload?.message || 'Failed to initialize Paystack checkout',
+        detail: payload,
+      });
     }
 
     return res.json({
@@ -151,7 +176,7 @@ router.post('/create-checkout', async (req, res) => {
       reference: payload.data.reference,
     });
   } catch (error) {
-    logger.error('Paystack checkout request crashed:', error.message);
+    logger.error('Paystack checkout request crashed:', error.message, error.stack);
     return res.status(500).json({
       error: 'Unable to reach Paystack checkout service',
       detail: error.message,
@@ -161,13 +186,15 @@ router.post('/create-checkout', async (req, res) => {
 
 router.post('/webhook', async (req, res) => {
   const signature = req.headers['x-paystack-signature'];
-  if (!signature || !PAYSTACK_SECRET_KEY) {
+  const paystackSecretKey = getPaystackSecretKey();
+
+  if (!signature || !paystackSecretKey) {
     return res.status(400).json({ error: 'Invalid webhook signature' });
   }
 
   try {
     const expectedHash = crypto
-      .createHmac('sha512', PAYSTACK_SECRET_KEY)
+      .createHmac('sha512', paystackSecretKey)
       .update(req.rawBody)
       .digest('hex');
 

@@ -21,6 +21,7 @@ const RestaurantPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [cart, setCart] = useState({});
+  const [submitMode, setSubmitMode] = useState('ground');
   const [hasAllergies, setHasAllergies] = useState(false);
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -33,10 +34,10 @@ const RestaurantPage = () => {
   });
 
   const menuItems = [
-    { id: 1, name: 'Pepper Soup (Goat/Fish)', price: 3800, desc: 'Spicy African delicacy for evening hangouts.', img: HOTEL_IMAGES.restaurantMain, highlight: true },
-    { id: 2, name: 'Jollof Rice with Chicken', price: 3500, desc: 'Classic spicy Nigerian jollof with grilled chicken.', img: HOTEL_IMAGES.restaurantMain },
-    { id: 3, name: 'Egusi Soup & Pounded Yam', price: 4200, desc: 'Traditional melon seed soup with smooth pounded yam.', img: HOTEL_IMAGES.restaurantMain },
-    { id: 4, name: 'Suya Platter', price: 2800, desc: 'Spicy grilled beef skewers with onions and peppers.', img: HOTEL_IMAGES.restaurantMain },
+    { id: 1, name: 'Pepper Soup (Goat/Fish)', price: 3800, desc: 'Spicy African delicacy for evening hangouts.', img: '/assets/images/menu-pepper-soup.svg', highlight: true },
+    { id: 2, name: 'Jollof Rice with Chicken', price: 3500, desc: 'Classic spicy Nigerian jollof with grilled chicken.', img: '/assets/images/menu-jollof-rice.svg' },
+    { id: 3, name: 'Egusi Soup & Pounded Yam', price: 4200, desc: 'Traditional melon seed soup with smooth pounded yam.', img: '/assets/images/menu-egusi-pounded-yam.svg' },
+    { id: 4, name: 'Suya Platter', price: 2800, desc: 'Spicy grilled beef skewers with onions and peppers.', img: '/assets/images/menu-suya-platter.svg' },
   ];
 
   const breakfastPackages = [
@@ -69,6 +70,7 @@ const RestaurantPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const action = e.nativeEvent?.submitter?.value || submitMode;
     if (Object.keys(cart).length === 0) {
       toast.error('Your order is empty. Add items to continue.');
       return;
@@ -80,6 +82,7 @@ const RestaurantPage = () => {
 
     setLoading(true);
     try {
+      const paymentMethod = action === 'online' ? 'pay_online' : 'pay_on_ground';
       const total = calculateTotal();
       const orderItems = Object.entries(cart).map(([id, qty]) => {
         const item = allItems.find(i => String(i.id) === String(id));
@@ -91,6 +94,7 @@ const RestaurantPage = () => {
         menu_items: orderItems,
         allergies: hasAllergies ? formData.allergies : 'None',
         dietary_requirements: formData.dietary_requirements || 'None',
+        payment_method: paymentMethod,
         total_price: total,
         order_status: 'pending'
       };
@@ -104,13 +108,19 @@ const RestaurantPage = () => {
         fallbackRecord: orderData,
       });
 
-      if (submission.mode === 'local_backup') {
+      if (submission.mode === 'local_backup' && paymentMethod === 'pay_online') {
+        toast.error('Payment is unavailable right now. Your order was not confirmed.');
+        return;
+      }
+
+      if (paymentMethod === 'pay_on_ground') {
         navigate('/payment-success', { state: { order: submission.record, submissionMode: submission.mode } });
         return;
       }
 
       const checkout = await startCheckoutOrShowPending({
         navigate,
+        requirePayment: true,
         amount: total,
         bookingId: submission.record.id,
         productName: 'Restaurant order',
@@ -119,7 +129,7 @@ const RestaurantPage = () => {
       });
 
       if (!checkout.started) {
-        toast.warning('Your request was saved, but payment could not be started automatically. Please contact the hotel to complete payment.');
+        toast.error(checkout.error?.message || 'Payment could not be started. Please try again.');
       }
     } catch (error) {
       console.error(error);
@@ -276,9 +286,29 @@ const RestaurantPage = () => {
                     <span className="text-lg font-medium text-foreground">Total Order Value:</span>
                     <span className="text-2xl font-bold text-secondary">₦{calculateTotal().toLocaleString()}</span>
                   </div>
-                  <Button type="submit" disabled={loading || calculateTotal() === 0} className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground py-6 text-lg rounded-xl transition-all">
-                  {loading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Submit Order Request'}
-                  </Button>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Button
+                      type="submit"
+                      name="submission_action"
+                      value="ground"
+                      disabled={loading || calculateTotal() === 0}
+                      variant="outline"
+                      onClick={() => setSubmitMode('ground')}
+                      className="w-full py-6 text-lg rounded-xl transition-all"
+                    >
+                      {loading && submitMode === 'ground' ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Pay on Ground'}
+                    </Button>
+                    <Button
+                      type="submit"
+                      name="submission_action"
+                      value="online"
+                      disabled={loading || calculateTotal() === 0}
+                      onClick={() => setSubmitMode('online')}
+                      className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground py-6 text-lg rounded-xl transition-all"
+                    >
+                      {loading && submitMode === 'online' ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Pay Online'}
+                    </Button>
+                  </div>
                 </div>
               </form>
             </motion.div>

@@ -38,7 +38,12 @@ router.post('/intake', async (req, res) => {
 // Alias for /create for backward compatibility
 router.post('/create', async (req, res) => {
   try {
-    const result = await createBooking(req.body);
+    const bookingData = req.body.data || req.body;
+    const type = req.body.bookingType || bookingData.type || 'General';
+    const result = await createBooking({
+      ...bookingData,
+      type,
+    });
     return res.status(201).json(result);
   } catch (error) {
     return res.status(500).json({ error: error.message });

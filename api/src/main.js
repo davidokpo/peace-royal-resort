@@ -1,10 +1,12 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import './env.js';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import routes from './routes/index.js';
 
 const app = express();
+app.disable('x-powered-by');
 
 // Basic trust proxy for Vercel/Cloud deployment
 app.set('trust proxy', true);
@@ -29,21 +31,29 @@ app.use(cors({
     credentials: true,
 }));
 
+app.use(helmet());
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: process.env.NODE_ENV === 'development' ? 1000 : 200,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests. Please try again later.' },
+}));
+
 app.use(express.json({
-    limit: '50mb',
+    limit: '1mb',
     verify: (req, res, buf) => {
         if (buf?.length) {
             req.rawBody = Buffer.from(buf);
         }
     },
 }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Health Check for Vercel
 app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'Peace Royal API is live', 
-        env: process.env.NODE_ENV,
         time: new Date() 
     });
 });

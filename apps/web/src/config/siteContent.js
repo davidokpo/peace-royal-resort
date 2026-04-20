@@ -1,5 +1,5 @@
 export const HOTEL_CONTACT = {
-  phoneDisplay: '09061967954',
+  phoneDisplay: '+2349061967954',
   phoneHref: 'tel:+2349061967954',
   email: 'info@peaceroyalresort.com',
   address: 'Opposite Candle Stick School, Gwarimpa, Abuja',
@@ -7,8 +7,8 @@ export const HOTEL_CONTACT = {
 };
 
 export const HOTEL_SOCIALS = {
-  instagram: 'https://instagram.com/peaceroyalresort',
-  facebook: 'https://facebook.com/peaceroyalresort',
+  instagram: 'https://instagram.com/peaceroyalresort.ng',
+  facebook: 'https://web.facebook.com/people/Peace-Royal-Resort/61566767152787/?rdid=eI6QGClpi14p6BA0&share_url=https%3A%2F%2Fweb.facebook.com%2Fshare%2F18kkGXHXeu%2F%3F_rdc%3D1%26_rdr',
   x: 'https://x.com/peaceroyalresort',
 };
 

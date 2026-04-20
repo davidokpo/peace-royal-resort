@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#28160f"/>
+      <stop offset="100%" stop-color="#a24620"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <ellipse cx="400" cy="445" rx="220" ry="56" fill="#000" opacity=".18"/>
+  <rect x="210" y="218" width="380" height="180" rx="32" fill="#1a120d"/>
+  <rect x="230" y="236" width="340" height="144" rx="24" fill="#2f2118"/>
+  <g transform="translate(250 250)">
+    <rect x="0" y="22" width="280" height="12" rx="6" fill="#c7a068"/>
+    <rect x="8" y="58" width="280" height="12" rx="6" fill="#c7a068"/>
+    <rect x="16" y="94" width="280" height="12" rx="6" fill="#c7a068"/>
+    <g fill="#8d3f20">
+      <rect x="18" y="0" width="34" height="56" rx="10"/>
+      <rect x="58" y="0" width="34" height="56" rx="10"/>
+      <rect x="98" y="0" width="34" height="56" rx="10"/>
+      <rect x="138" y="0" width="34" height="56" rx="10"/>
+      <rect x="178" y="0" width="34" height="56" rx="10"/>
+      <rect x="218" y="0" width="34" height="56" rx="10"/>
+      <rect x="26" y="36" width="34" height="56" rx="10"/>
+      <rect x="66" y="36" width="34" height="56" rx="10"/>
+      <rect x="106" y="36" width="34" height="56" rx="10"/>
+      <rect x="146" y="36" width="34" height="56" rx="10"/>
+      <rect x="186" y="36" width="34" height="56" rx="10"/>
+      <rect x="226" y="36" width="34" height="56" rx="10"/>
+      <rect x="34" y="72" width="34" height="56" rx="10"/>
+      <rect x="74" y="72" width="34" height="56" rx="10"/>
+      <rect x="114" y="72" width="34" height="56" rx="10"/>
+      <rect x="154" y="72" width="34" height="56" rx="10"/>
+      <rect x="194" y="72" width="34" height="56" rx="10"/>
+      <rect x="234" y="72" width="34" height="56" rx="10"/>
+    </g>
+  </g>
+  <circle cx="590" cy="275" r="22" fill="#e6d9b2"/>
+  <circle cx="626" cy="301" r="18" fill="#f0e4bd"/>
+  <circle cx="614" cy="344" r="16" fill="#d6482d"/>
+  <text x="52" y="82" fill="#f7ead8" font-size="42" font-family="Georgia, serif">Suya Platter</text>
+  <text x="52" y="120" fill="#efc795" font-size="24" font-family="Arial, sans-serif">Spiced skewers, onion rings, pepper finish</text>
+</svg>

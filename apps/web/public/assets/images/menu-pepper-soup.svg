@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2f1b15"/>
+      <stop offset="100%" stop-color="#8d4b2b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <ellipse cx="400" cy="430" rx="210" ry="60" fill="#000" opacity=".18"/>
+  <circle cx="400" cy="300" r="170" fill="#f2f0e9"/>
+  <circle cx="400" cy="300" r="145" fill="#7d1f14"/>
+  <circle cx="335" cy="265" r="34" fill="#d9a066"/>
+  <circle cx="468" cy="330" r="30" fill="#c98958"/>
+  <circle cx="412" cy="240" r="28" fill="#e6bf88"/>
+  <path d="M285 348c34-40 76-67 120-80 54 17 95 44 123 81-89 23-160 24-243-1Z" fill="#6f8f38"/>
+  <path d="M292 236c26 3 42 14 46 31-31-3-46-14-46-31Zm165 130c23 2 37 12 41 29-27-2-40-12-41-29Z" fill="#f4d46a"/>
+  <text x="52" y="82" fill="#f7ead3" font-size="42" font-family="Georgia, serif">Pepper Soup</text>
+  <text x="52" y="120" fill="#f0c483" font-size="24" font-family="Arial, sans-serif">Goat or Fish, rich broth, evening favorite</text>
+</svg>
