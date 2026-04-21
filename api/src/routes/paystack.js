@@ -184,6 +184,64 @@ router.post('/create-checkout', async (req, res) => {
   }
 });
 
+router.get('/verify/:reference', async (req, res) => {
+  try {
+    const { reference } = req.params;
+    const paystackSecretKey = getPaystackSecretKey();
+
+    if (!reference) {
+      return res.status(400).json({ error: 'Transaction reference is required' });
+    }
+
+    if (!paystackSecretKey) {
+      return res.status(500).json({ error: 'Paystack secret key is not configured on the server' });
+    }
+
+    const response = await fetch(
+      `${PAYSTACK_BASE_URL}/transaction/verify/${encodeURIComponent(reference)}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${paystackSecretKey}`,
+        },
+      },
+    );
+
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok || !payload?.status || !payload?.data) {
+      logger.error('Paystack verification failed:', payload);
+      return res.status(400).json({
+        error: payload?.message || 'Failed to verify Paystack transaction',
+        detail: payload,
+      });
+    }
+
+    const transaction = payload.data;
+    const bookingId = transaction?.metadata?.bookingId;
+    let booking = null;
+
+    if (transaction.status === 'success' && bookingId) {
+      booking = await markBookingPaid(bookingId, transaction.reference);
+    }
+
+    return res.json({
+      verified: transaction.status === 'success',
+      status: transaction.status,
+      reference: transaction.reference,
+      bookingId,
+      booking,
+      gatewayResponse: transaction.gateway_response,
+    });
+  } catch (error) {
+    logger.error('Paystack verification request crashed:', error.message, error.stack);
+    return res.status(500).json({
+      error: 'Unable to verify Paystack transaction',
+      detail: error.message,
+    });
+  }
+});
+
 router.post('/webhook', async (req, res) => {
   const signature = req.headers['x-paystack-signature'];
   const paystackSecretKey = getPaystackSecretKey();

@@ -8,6 +8,7 @@ import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import { HOTEL_CONTACT } from '@/config/siteContent.js';
 import { readPendingPayment, storePendingPayment } from '@/lib/paymentCheckout';
+import apiServerClient from '@/lib/apiServerClient.js';
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -30,6 +31,60 @@ const PaymentSuccess = () => {
     storePendingPayment(nextState);
   }, [location.search, location.state]);
 
+  useEffect(() => {
+    const paymentReference =
+      data?.paymentReference ||
+      new URLSearchParams(location.search).get('reference') ||
+      new URLSearchParams(location.search).get('trxref');
+
+    if (!paymentReference) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const verifyPayment = async () => {
+      try {
+        const response = await apiServerClient.fetch(`/paystack/verify/${encodeURIComponent(paymentReference)}`);
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || !result?.verified || cancelled) {
+          return;
+        }
+
+        setData((current) => {
+          if (!current) {
+            return current;
+          }
+
+          const verifiedBooking = result.booking || {};
+          const nextState = {
+            ...current,
+            paymentReference: result.reference || paymentReference,
+            paymentVerified: true,
+            booking: current.booking
+              ? { ...current.booking, ...verifiedBooking }
+              : current.booking,
+            order: current.order
+              ? { ...current.order, ...verifiedBooking }
+              : current.order,
+          };
+
+          storePendingPayment(nextState);
+          return nextState;
+        });
+      } catch {
+        // Keep the fallback success state when verification cannot complete immediately.
+      }
+    };
+
+    verifyPayment();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [data?.paymentReference, location.search]);
+
   const booking = data?.booking;
   const order = data?.order;
   const submissionMode =
@@ -40,9 +95,14 @@ const PaymentSuccess = () => {
   const isLocalBackup = submissionMode === 'local_backup';
   const paymentMethod = booking?.payment_method || order?.payment_method || '';
   const paymentStatus = booking?.payment_status || order?.payment_status || 'pending';
-  const paidLabel = booking?.paid || order?.paid || (paymentMethod === 'pay_on_ground' ? 'Pay on ground' : paymentStatus === 'paid' ? 'Paid online (Paystack)' : 'Awaiting online payment');
+  const hasPaymentReference = Boolean(data?.paymentReference);
   const isPayOnGround = paymentMethod === 'pay_on_ground';
-  const isPaidOnline = paymentStatus === 'paid' || Boolean(data?.paymentReference);
+  const isPaidOnline = paymentStatus === 'paid' || data?.paymentVerified === true || hasPaymentReference;
+  const paidLabel = isPayOnGround
+    ? 'Pay on ground'
+    : isPaidOnline
+      ? 'Paid online (Paystack)'
+      : 'Awaiting online payment';
 
   const getDetails = () => {
     if (booking?.room_type) {
