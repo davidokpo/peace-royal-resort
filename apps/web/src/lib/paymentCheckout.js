@@ -3,6 +3,14 @@ import apiServerClient from './apiServerClient';
 const PENDING_PAYMENT_KEY = 'peace-royal-resort-pending-payment';
 const PAYMENTS_ENABLED = import.meta.env.VITE_ENABLE_PAYMENTS === 'true';
 
+// Paystack online payment is temporarily turned off while the account is being
+// approved. Bookings are still recorded to Google Sheets via /bookings/intake
+// (which runs before this helper), so we simply confirm the booking instead of
+// redirecting to Paystack. While this is true every booking is treated as
+// "pay on ground" (see bookingSubmission.js). Set this back to false to restore
+// online checkout.
+export const SKIP_ONLINE_PAYMENT = true;
+
 export const storePendingPayment = (state) => {
   if (typeof window === 'undefined') {
     return;
@@ -67,6 +75,24 @@ export const startCheckoutOrShowPending = async ({
   requirePayment = false,
   ...checkoutArgs
 }) => {
+  // While Paystack is disabled, confirm the booking directly. The record has
+  // already been saved to Google Sheets before this point, so we just route the
+  // guest to the confirmation page without starting an online payment.
+  if (SKIP_ONLINE_PAYMENT) {
+    const successState = {
+      ...checkoutArgs.state,
+      checkoutStatus: 'disabled',
+    };
+
+    storePendingPayment(successState);
+    navigate(pendingPath, { state: successState });
+
+    return {
+      started: true,
+      skipped: true,
+    };
+  }
+
   if (!PAYMENTS_ENABLED) {
     if (requirePayment) {
       return {
