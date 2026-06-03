@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
+import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout.js';
@@ -126,6 +127,8 @@ const WellnessPage = () => {
   const [loading, setLoading] = useState(false);
   const [submitMode, setSubmitMode] = useState('reserve');
   const [selectedPackageId, setSelectedPackageId] = useState(packages[0].id);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaResetCount, setCaptchaResetCount] = useState(0);
   const [formData, setFormData] = useState({
     participant_name: '',
     email: '',
@@ -158,6 +161,12 @@ const WellnessPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const action = e.nativeEvent?.submitter?.value || submitMode;
+
+    if (isTurnstileEnabled() && !captchaToken) {
+      toast.error('Please complete the captcha challenge.');
+      return;
+    }
+
     setLoading(true);
     try {
       const paymentMethod = action === 'pay' ? 'pay_online' : 'pay_on_ground';
@@ -184,18 +193,19 @@ const WellnessPage = () => {
         endpoint: '/bookings/intake',
         payload: {
           bookingType: 'wellness',
+          captchaToken,
           data: bookingData,
         },
-        fallbackRecord: bookingData,
       });
 
-      if (submission.mode === 'local_backup' || action === 'reserve') {
+      if (action === 'reserve') {
         navigate('/payment-success', { state: { booking: submission.record, submissionMode: submission.mode } });
         return;
       }
 
       const checkout = await startCheckoutOrShowPending({
         navigate,
+        requirePayment: true,
         amount: total,
         bookingId: submission.record.id,
         productName: `${chosenPackage.name} booking`,
@@ -211,6 +221,9 @@ const WellnessPage = () => {
       toast.error(error.message || 'Booking failed. Try again.');
     } finally {
       setLoading(false);
+      if (isTurnstileEnabled()) {
+        setCaptchaResetCount((count) => count + 1);
+      }
     }
   };
 
@@ -220,22 +233,22 @@ const WellnessPage = () => {
         <title>Packages and Retreats - Peace Royal Resort</title>
       </Helmet>
 
-      <div className="min-h-screen bg-[#F7F1E8]">
+      <div className="min-h-screen bg-background text-foreground">
         <Header />
         <SidebarNavigation />
 
-        <main className="lg:ml-24">
-          <section className="relative overflow-hidden bg-gradient-to-br from-[#F7F1E8] via-[#EEF2E6] to-[#E7D8C7] pt-32 pb-24">
-            <div className="absolute inset-0 organic-pattern opacity-20"></div>
+        <main>
+          <section className="relative overflow-hidden bg-background pt-32 pb-24">
+            <div className="absolute inset-0 dot-pattern opacity-20"></div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#58705B]/20 bg-white/60 px-4 py-2 text-sm font-medium text-[#58705B] backdrop-blur-sm">
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-primary backdrop-blur-sm">
                   <Sparkles className="h-4 w-4" /> Curated stay packages
                 </div>
-                <h1 className="heading-font mt-6 text-5xl font-bold leading-tight text-[#2F3A2F] md:text-6xl">
+                <h1 className="heading-font mt-6 text-5xl font-bold leading-tight text-foreground md:text-6xl">
                   Packages made for calm, comfort, and beautiful memories.
                 </h1>
-                <p className="mt-6 max-w-3xl text-lg leading-relaxed text-[#4A564A]">
+                <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground">
                   Choose the feeling you want to carry home with you. Whether you want restoration, indulgence, playful connection, or a structured workday, each package is designed as a full little world of access, food, and atmosphere.
                 </p>
 
@@ -248,24 +261,24 @@ const WellnessPage = () => {
                         key={item.id}
                         type="button"
                         onClick={() => handlePackageSelect(item.id)}
-                        className={`flex h-full flex-col rounded-[2rem] border p-6 text-left transition-all duration-300 ${item.cardTone} ${
+                        className={`flex h-full flex-col rounded-[2rem] border bg-card p-6 text-left transition-all duration-300 ${
                           isSelected
-                            ? 'border-[#2F3A2F] shadow-[0_18px_60px_rgba(47,58,47,0.18)]'
-                            : 'border-white/70 shadow-[0_12px_40px_rgba(80,70,50,0.08)] hover:shadow-[0_18px_50px_rgba(80,70,50,0.14)]'
+                            ? 'border-primary/30 shadow-[0_18px_60px_rgba(47,58,47,0.18)]'
+                            : 'border-border/70 shadow-[0_12px_40px_rgba(80,70,50,0.08)] hover:shadow-[0_18px_50px_rgba(80,70,50,0.14)]'
                         }`}
                       >
-                        <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${item.accent} text-white shadow-lg`}>
+                        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
                           <Icon className="h-7 w-7" />
                         </div>
-                        <div className="text-sm font-semibold uppercase tracking-[0.22em] text-[#6D755F]">{item.shortLabel}</div>
-                        <h2 className="mt-2 text-2xl font-bold text-[#2F3A2F]">{item.name}</h2>
-                        <p className="mt-3 text-sm leading-6 text-[#586458]">{item.description}</p>
+                        <div className="text-sm font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.shortLabel}</div>
+                        <h2 className="mt-2 text-2xl font-bold text-foreground">{item.name}</h2>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.description}</p>
                         <div className="mt-5 flex items-end justify-between gap-3">
                           <div>
-                            <span className="text-2xl font-bold text-[#2F3A2F]">N{item.price.toLocaleString()}</span>
-                            <p className="mt-1 text-xs text-[#6D755F]">{item.priceNote || 'Priced per booking package.'}</p>
+                            <span className="text-2xl font-bold text-foreground">N{item.price.toLocaleString()}</span>
+                            <p className="mt-1 text-xs text-muted-foreground">{item.priceNote || 'Priced per booking package.'}</p>
                           </div>
-                          <span className="text-sm font-medium text-[#7C5B3B]">{item.cta}</span>
+                          <span className="text-sm font-medium text-primary">{item.cta}</span>
                         </div>
                       </button>
                     );
@@ -288,7 +301,7 @@ const WellnessPage = () => {
                   </div>
 
                   <div className="p-8">
-                    <div className="rounded-[2rem] bg-[#2F3A2F] p-6 text-white shadow-xl">
+                    <div className="rounded-[2rem] bg-primary p-6 text-primary-foreground shadow-xl">
                       <div className="grid gap-6 xl:grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)] xl:items-start">
                         <div className="rounded-[1.75rem] bg-white/8 p-5">
                           <div className="flex items-center justify-between gap-4">
@@ -354,27 +367,22 @@ const WellnessPage = () => {
                             <Label className="text-white/80">Special requests</Label>
                             <Textarea value={formData.special_requests} onChange={e => setFormData({ ...formData, special_requests: e.target.value })} className="border-white/20 bg-white/10 text-white placeholder:text-white/50" rows={4} placeholder="Tell us how you want the experience to feel." />
                           </div>
-                          <div className="grid gap-3 sm:grid-cols-2">
+                          <TurnstileField
+                            onVerify={setCaptchaToken}
+                            onError={(message) => toast.error(message)}
+                            resetSignal={captchaResetCount}
+                            className="pt-2"
+                          />
+                          <div className="grid gap-3">
                             <Button
                               type="submit"
                               name="submission_action"
                               value="reserve"
                               disabled={loading}
-                              variant="outline"
                               onClick={() => setSubmitMode('reserve')}
-                              className="h-12 w-full rounded-xl border-white/20 bg-white/10 text-white hover:bg-white/15"
+                              className="h-12 w-full rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/90"
                             >
-                              {loading && submitMode === 'reserve' ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Pay on Ground'}
-                            </Button>
-                            <Button
-                              type="submit"
-                              name="submission_action"
-                              value="pay"
-                              disabled={loading}
-                              onClick={() => setSubmitMode('pay')}
-                              className="h-12 w-full rounded-xl bg-[#D7A65A] text-[#2F2418] hover:bg-[#e2b56f]"
-                            >
-                              {loading && submitMode === 'pay' ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Pay Online'}
+                              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Book Now'}
                             </Button>
                           </div>
                         </form>

@@ -15,6 +15,7 @@ import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import MediaSlideshow from '@/components/MediaSlideshow.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
+import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout.js';
@@ -25,6 +26,8 @@ const CafePage = () => {
   const [cart, setCart] = useState({});
   const [submitMode, setSubmitMode] = useState('ground');
   const [isFriday, setIsFriday] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaResetCount, setCaptchaResetCount] = useState(0);
   
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -35,8 +38,13 @@ const CafePage = () => {
     delivery_type: 'pickup',
     board_game_selection: '',
     player_count: 2,
-    game_time_slot: ''
+    game_time_slot: '',
+    smoothie_fruit_choice: '',
+    club_sandwich_cheese: ''
   });
+
+  const SMOOTHIE_ITEM_ID = 7;
+  const CLUB_SANDWICH_ITEM_ID = 15;
 
   const cafeItems = [
     { id: 1, category: 'Signature Tea', name: 'Bubble Tea', price: 3000, img: '/assets/images/menu-green-smoothie.svg', desc: 'Creamy chilled tea with a playful textured finish.' },
@@ -45,31 +53,35 @@ const CafePage = () => {
     { id: 4, category: 'Signature Tea', name: 'Flavored Tea', price: 1800, img: '/assets/images/menu-chamomile-tea.svg', desc: 'Infused with lemon, honey, or fruit flavors.' },
     { id: 5, category: 'Coffee', name: 'Artisan Espresso', price: 1000, img: '/assets/images/menu-artisan-espresso.svg', desc: 'Bold short coffee for focused work blocks.' },
     { id: 6, category: 'Tea Latte', name: 'Matcha Latte', price: 1800, img: '/assets/images/menu-matcha-latte.svg', desc: 'Earthy green tea latte with a smooth finish.' },
-    { id: 7, category: 'Fresh Blend', name: 'Fresh Green Smoothie', price: 2500, img: '/assets/images/menu-green-smoothie.svg', desc: 'Cold blended greens and fruit for a clean lift.' },
+    { id: SMOOTHIE_ITEM_ID, category: 'Fresh Blend', name: 'Fresh Fruit Smoothie', price: 2500, img: '/assets/images/menu-green-smoothie.svg', desc: 'Choose banana, pineapple, watermelon, or a fresh mix of all three.' },
     { id: 8, category: 'Pastry', name: 'Meat Pie', price: 1500, img: '/assets/images/restaurant-main.svg', desc: 'Flaky pastry with a rich savory meat filling.' },
     { id: 9, category: 'Pastry', name: 'Chicken Pie', price: 1700, img: '/assets/images/restaurant-main.svg', desc: 'Buttery pastry filled with seasoned chicken.' },
     { id: 10, category: 'Pastry', name: 'Fish Pie', price: 1500, img: '/assets/images/restaurant-main.svg', desc: 'Golden pastry stuffed with a savory fish filling.' },
     { id: 11, category: 'Snack', name: 'Small Chops', price: 3500, img: '/assets/images/restaurant-main.svg', desc: 'A mixed tray of crisp samosa, spring rolls, and puff-puff for easy sharing.' },
     { id: 14, category: 'Pastry', name: 'Doughnut', price: 800, img: '/assets/images/restaurant-main.svg', desc: 'Classic soft doughnut for a quick sweet break.' },
-    { id: 15, category: 'Snack', name: 'Club Sandwich', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Layered sandwich for a fuller cafe meal.' },
+    { id: CLUB_SANDWICH_ITEM_ID, category: 'Snack', name: 'Club Sandwich', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Layered sandwich for a fuller cafe meal, with or without cheese.' },
     { id: 16, category: 'Breakfast', name: 'Pancake', price: 500, img: '/assets/images/restaurant-main.svg', desc: 'Soft fresh pancake served warm.' },
     { id: 17, category: 'Breakfast', name: 'Pancake with Topping', price: 700, img: '/assets/images/restaurant-main.svg', desc: 'Warm pancake finished with your topping.' },
     { id: 18, category: 'Breakfast', name: '6 Pancakes with Topping', price: 4000, img: '/assets/images/restaurant-main.svg', desc: 'A full pack of six pancakes with topping for sharing.' },
   ];
 
   const workspaceMedia = [
-    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe workspace video', startAt: 10, endAt: 20 },
-    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe event energy', startAt: 12, endAt: 22 },
-    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe games video', startAt: 10, endAt: 20 },
+    { src: '/assets/images/cafe-workspace.svg', alt: 'Cafe workspace preview' },
+    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe workspace video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-workspace.svg' },
+    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe event energy', startAt: 12, endAt: 22, poster: '/assets/images/cafe-workspace.svg' },
+    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe games video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-games.svg' },
   ];
 
   const featuredCafeItems = cafeItems.slice(0, 8);
   const secondaryCafeItems = cafeItems.slice(8);
+  const hasSmoothieInCart = Boolean(cart[SMOOTHIE_ITEM_ID]);
+  const hasClubSandwichInCart = Boolean(cart[CLUB_SANDWICH_ITEM_ID]);
 
   const gameNightMedia = [
-    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe game night video', startAt: 10, endAt: 20 },
-    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe group gaming clip', startAt: 12, endAt: 22 },
-    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe social workspace event video', startAt: 10, endAt: 20 },
+    { src: '/assets/images/cafe-games.svg', alt: 'Cafe game night preview' },
+    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe game night video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-games.svg' },
+    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe group gaming clip', startAt: 12, endAt: 22, poster: '/assets/images/cafe-workspace.svg' },
+    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe social workspace event video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-workspace.svg' },
   ];
 
   const updateCart = (item, delta) => {
@@ -104,13 +116,41 @@ const CafePage = () => {
       toast.error('Friday Game Night requires a minimum order of N3,000 to reserve a table.');
       return;
     }
+    if (hasSmoothieInCart && !formData.smoothie_fruit_choice) {
+      toast.error('Please choose the fruits for your smoothie.');
+      return;
+    }
+    if (hasClubSandwichInCart && !formData.club_sandwich_cheese) {
+      toast.error('Please choose club sandwich with cheese or without cheese.');
+      return;
+    }
+    if (isTurnstileEnabled() && !captchaToken) {
+      toast.error('Please complete the captcha challenge.');
+      return;
+    }
 
     setLoading(true);
     try {
       const paymentMethod = action === 'online' ? 'pay_online' : 'pay_on_ground';
       const orderItems = Object.entries(cart).map(([id, qty]) => {
         const item = cafeItems.find(i => String(i.id) === String(id));
-        return { id: item.id, name: item.name, price: item.price, quantity: qty };
+        const options = {};
+
+        if (item.id === SMOOTHIE_ITEM_ID) {
+          options.smoothie_fruits = formData.smoothie_fruit_choice;
+        }
+
+        if (item.id === CLUB_SANDWICH_ITEM_ID) {
+          options.cheese_preference = formData.club_sandwich_cheese;
+        }
+
+        return {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: qty,
+          ...(Object.keys(options).length ? { options } : {})
+        };
       });
 
       const orderData = {
@@ -135,15 +175,10 @@ const CafePage = () => {
         endpoint: '/bookings/intake',
         payload: {
           bookingType: 'cafe',
+          captchaToken,
           data: orderData,
         },
-        fallbackRecord: orderData,
       });
-
-      if (submission.mode === 'local_backup' && paymentMethod === 'pay_online') {
-        toast.error('Payment is unavailable right now. Your order was not confirmed.');
-        return;
-      }
 
       if (paymentMethod === 'pay_on_ground') {
         navigate('/payment-success', { state: { order: submission.record, submissionMode: submission.mode } });
@@ -168,6 +203,9 @@ const CafePage = () => {
       toast.error(error.message || 'Order failed. Please try again.');
     } finally {
       setLoading(false);
+      if (isTurnstileEnabled()) {
+        setCaptchaResetCount((count) => count + 1);
+      }
     }
   };
 
@@ -177,46 +215,45 @@ const CafePage = () => {
         <title>Cafe & Workspace — Peace Royal Resort</title>
       </Helmet>
 
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-background text-foreground">
         <Header />
         <SidebarNavigation />
 
-        <main className="lg:ml-24">
+        <main>
           {/* Top Section - Workspace */}
-          <section className="bg-[#8B5E3C] text-white pt-32 pb-24 relative overflow-hidden">
-            <div className="absolute inset-0 organic-pattern opacity-10 mix-blend-overlay"></div>
+          <section className="bg-background text-foreground pt-32 pb-24 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-                  <Laptop className="w-12 h-12 text-[#D9C5B2] mb-6" />
+                  <Laptop className="w-12 h-12 text-primary mb-6" />
                   <h1 className="heading-font text-5xl md:text-6xl font-bold mb-4">Your Workspace.<br/>Your Vibe.</h1>
-                  <p className="text-lg text-white/80 max-w-lg leading-relaxed mb-8">
+                  <p className="text-lg text-muted-foreground max-w-lg leading-relaxed mb-8">
                     Remote work, creative sessions, or just a quiet corner. Fuel your flow with signature teas, pastries, and light bites in a serene, distraction-free environment.
                   </p>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {featuredCafeItems.map(item => (
-                      <div key={item.id} className={`bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 flex flex-col justify-between ${item.night ? 'ring-1 ring-[#7FFF00]/50 neon-green' : ''}`}>
+                      <div key={item.id} className={`bg-card/85 backdrop-blur-md rounded-2xl overflow-hidden border border-border/60 flex flex-col justify-between shadow-sm ${item.night ? 'ring-1 ring-primary/20' : ''}`}>
                         <div className="relative h-40">
                           <img src={item.img} alt={item.name} className="h-full w-full object-cover" loading="lazy" />
                           {item.night && (
-                            <div className="absolute right-3 top-3 rounded-full bg-black/45 p-2">
-                              <Moon className="w-4 h-4 text-[#7FFF00]" />
+                            <div className="absolute right-3 top-3 rounded-full bg-background/85 p-2 shadow-sm">
+                              <Moon className="w-4 h-4 text-primary" />
                             </div>
                           )}
                         </div>
                         <div className="flex flex-1 flex-col p-5">
                           <div className="mb-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">{item.category}</p>
-                            <h3 className="font-semibold text-white">{item.name}</h3>
-                            <p className="mt-2 text-sm text-white/70">{item.desc}</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.category}</p>
+                            <h3 className="font-semibold text-foreground">{item.name}</h3>
+                            <p className="mt-2 text-sm text-muted-foreground">{item.desc}</p>
                           </div>
                           <div className="flex justify-between items-center mt-auto">
-                          <span className="font-medium text-white/90">N{item.price.toLocaleString()}</span>
-                          <div className="flex items-center gap-2 bg-black/20 rounded-full px-2 py-1">
-                            <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white/20 rounded-full"><Minus className="w-3 h-3" /></button>
-                            <span className="text-sm font-medium w-4 text-center">{cart[item.id] || 0}</span>
-                            <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-white/20 rounded-full"><Plus className="w-3 h-3 text-[#FFB84D]" /></button>
+                          <span className="font-medium text-foreground">N{item.price.toLocaleString()}</span>
+                          <div className="flex items-center gap-2 bg-muted rounded-full px-2 py-1">
+                            <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-background rounded-full"><Minus className="w-3 h-3" /></button>
+                            <span className="text-sm font-medium w-4 text-center text-foreground">{cart[item.id] || 0}</span>
+                            <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-background rounded-full"><Plus className="w-3 h-3 text-primary" /></button>
                           </div>
                           </div>
                         </div>
@@ -226,27 +263,27 @@ const CafePage = () => {
                 </motion.div>
                 
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} className="space-y-5">
-                  <div className="h-[500px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10">
-                    <MediaSlideshow items={workspaceMedia} className="h-full w-full" />
+                  <div className="h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-border/60">
+                    <MediaSlideshow items={workspaceMedia} className="h-full w-full" activateWhenInView />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {secondaryCafeItems.map(item => (
-                      <div key={item.id} className={`bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 flex flex-col justify-between ${item.night ? 'ring-1 ring-[#7FFF00]/50 neon-green' : ''}`}>
+                      <div key={item.id} className={`bg-card/85 backdrop-blur-md rounded-2xl overflow-hidden border border-border/60 flex flex-col justify-between shadow-sm ${item.night ? 'ring-1 ring-primary/20' : ''}`}>
                         <div className="relative h-32">
                           <img src={item.img} alt={item.name} className="h-full w-full object-cover" loading="lazy" />
                         </div>
                         <div className="flex flex-1 flex-col p-4">
                           <div className="mb-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/55">{item.category}</p>
-                            <h3 className="font-semibold text-white">{item.name}</h3>
-                            <p className="mt-2 text-sm text-white/70">{item.desc}</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.category}</p>
+                            <h3 className="font-semibold text-foreground">{item.name}</h3>
+                            <p className="mt-2 text-sm text-muted-foreground">{item.desc}</p>
                           </div>
                           <div className="mt-auto flex items-center justify-between gap-3">
-                            <span className="font-medium text-white/90">N{item.price.toLocaleString()}</span>
-                            <div className="flex items-center gap-2 bg-black/20 rounded-full px-2 py-1">
-                              <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white/20 rounded-full"><Minus className="w-3 h-3" /></button>
-                              <span className="text-sm font-medium w-4 text-center">{cart[item.id] || 0}</span>
-                              <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-white/20 rounded-full"><Plus className="w-3 h-3 text-[#FFB84D]" /></button>
+                            <span className="font-medium text-foreground">N{item.price.toLocaleString()}</span>
+                            <div className="flex items-center gap-2 bg-muted rounded-full px-2 py-1">
+                              <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-background rounded-full"><Minus className="w-3 h-3" /></button>
+                              <span className="text-sm font-medium w-4 text-center text-foreground">{cart[item.id] || 0}</span>
+                              <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-background rounded-full"><Plus className="w-3 h-3 text-primary" /></button>
                             </div>
                           </div>
                         </div>
@@ -259,52 +296,49 @@ const CafePage = () => {
           </section>
 
           {/* Leaf Transition Divider */}
-          <div className="w-full h-16 bg-[#8B5E3C] relative overflow-hidden">
-             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#5A634B]"></div>
-             <div className="absolute inset-0 organic-pattern opacity-20"></div>
+          <div className="w-full h-10 bg-background">
           </div>
 
           {/* Bottom Section - Friday Game Night */}
-          <section className="bg-[#5A634B] text-white py-24 relative overflow-hidden">
-            <div className="absolute inset-0 organic-pattern opacity-20"></div>
+          <section className="bg-muted/30 text-foreground py-24 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               
               <div className="text-center mb-16">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-[#FFB84D] mb-6 neon-amber font-semibold uppercase tracking-wider text-sm">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border text-primary mb-6 font-semibold uppercase tracking-wider text-sm">
                   <Users className="w-4 h-4" /> Community Weekend
                 </div>
                 <h2 className="heading-font text-5xl md:text-6xl font-bold mb-4 text-balance">Friday Night Lights</h2>
-                <p className="text-lg text-white/80 max-w-2xl mx-auto">
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                   Every Friday. Community. Games. Good vibes. Join us for a minimalist cafe takeover where strangers become friends over board games.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-20">
                 <div className="h-[400px] rounded-3xl overflow-hidden shadow-2xl relative">
-                  <MediaSlideshow items={gameNightMedia} className="h-full w-full" overlayClassName="bg-black/20" />
+                  <MediaSlideshow items={gameNightMedia} className="h-full w-full" overlayClassName="bg-black/20" activateWhenInView />
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
-                  <h3 className="text-2xl font-bold mb-6 flex items-center gap-3"><Gamepad2 className="w-6 h-6 text-[#FFB84D]" /> Reserve Your Table</h3>
+                <div className="bg-card/90 backdrop-blur-xl border border-border rounded-3xl p-8 shadow-sm">
+                  <h3 className="text-2xl font-bold mb-6 flex items-center gap-3"><Gamepad2 className="w-6 h-6 text-primary" /> Reserve Your Table</h3>
                   <p className="text-white/70 mb-6 text-sm">Secure a table for game night by placing a minimum food/drink order of ₦3,000 per table. Select your game and time slot below.</p>
                   
-                  <div className="flex items-center gap-3 bg-black/20 p-4 rounded-xl mb-8">
+                  <div className="flex items-center gap-3 bg-muted p-4 rounded-xl mb-8">
                     <Checkbox id="friday_toggle" checked={isFriday} onCheckedChange={(val) => {
                       setIsFriday(val);
                       if (val) setFormData(f => ({ ...f, delivery_type: 'pickup' }));
-                    }} className="border-white/50 data-[state=checked]:bg-[#FFB84D]" />
-                    <Label htmlFor="friday_toggle" className="text-white cursor-pointer font-medium text-lg">Yes, I'm booking for Friday Game Night</Label>
+                    }} className="border-border data-[state=checked]:bg-primary" />
+                    <Label htmlFor="friday_toggle" className="text-foreground cursor-pointer font-medium text-lg">Yes, I'm booking for Friday Game Night</Label>
                   </div>
 
                   {isFriday && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
                       <div>
-                        <Label className="text-white/80 mb-2 block">Select Game</Label>
+                        <Label className="text-muted-foreground mb-2 block">Select Game</Label>
                         <RadioGroup value={formData.board_game_selection} onValueChange={(val) => setFormData({...formData, board_game_selection: val})} className="grid grid-cols-3 gap-3">
                           {['Chess', 'Monopoly', 'Scrabble'].map(game => (
                             <div key={game}>
                               <RadioGroupItem value={game} id={game} className="peer sr-only" />
-                              <Label htmlFor={game} className="flex flex-col items-center justify-center rounded-xl border-2 border-white/20 bg-white/5 p-4 peer-data-[state=checked]:border-[#FFB84D] peer-data-[state=checked]:bg-[#FFB84D]/10 hover:bg-white/10 cursor-pointer transition-all">
+                              <Label htmlFor={game} className="flex flex-col items-center justify-center rounded-xl border-2 border-border bg-background p-4 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 hover:bg-muted cursor-pointer transition-all">
                                 {game}
                               </Label>
                             </div>
@@ -313,13 +347,13 @@ const CafePage = () => {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-white/80">Players (1-6)</Label>
-                          <Input type="number" min="1" max="6" value={formData.player_count} onChange={(e) => setFormData({...formData, player_count: e.target.value})} className="bg-black/20 border-white/20 text-white mt-1" />
+                          <Label className="text-muted-foreground">Players (1-6)</Label>
+                          <Input type="number" min="1" max="6" value={formData.player_count} onChange={(e) => setFormData({...formData, player_count: e.target.value})} className="bg-background border-border text-foreground mt-1" />
                         </div>
                         <div>
-                          <Label className="text-white/80">Time Slot</Label>
+                          <Label className="text-muted-foreground">Time Slot</Label>
                           <Select value={formData.game_time_slot} onValueChange={(val) => setFormData({...formData, game_time_slot: val})}>
-                            <SelectTrigger className="bg-black/20 border-white/20 text-white mt-1">
+                            <SelectTrigger className="bg-background border-border text-foreground mt-1">
                               <SelectValue placeholder="Select time" />
                             </SelectTrigger>
                             <SelectContent>
@@ -354,6 +388,40 @@ const CafePage = () => {
                     </div>
                   </div>
 
+                  {(hasSmoothieInCart || hasClubSandwichInCart) && (
+                    <div className="space-y-5 rounded-2xl border border-border bg-muted/40 p-5">
+                      <h4 className="font-semibold text-foreground">Customize selected items</h4>
+
+                      {hasSmoothieInCart && (
+                        <div className="space-y-3">
+                          <Label>Smoothie fruits</Label>
+                          <RadioGroup value={formData.smoothie_fruit_choice} onValueChange={(val) => setFormData({...formData, smoothie_fruit_choice: val})} className="grid gap-3 sm:grid-cols-2">
+                            {['Banana', 'Pineapple', 'Watermelon', 'Mix of all'].map(option => (
+                              <div key={option} className="flex items-center space-x-2 rounded-xl border border-border bg-card p-3">
+                                <RadioGroupItem value={option} id={`smoothie_${option.toLowerCase().replaceAll(' ', '_')}`} />
+                                <Label htmlFor={`smoothie_${option.toLowerCase().replaceAll(' ', '_')}`} className="cursor-pointer">{option}</Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        </div>
+                      )}
+
+                      {hasClubSandwichInCart && (
+                        <div className="space-y-3">
+                          <Label>Club sandwich option</Label>
+                          <RadioGroup value={formData.club_sandwich_cheese} onValueChange={(val) => setFormData({...formData, club_sandwich_cheese: val})} className="grid gap-3 sm:grid-cols-2">
+                            {['With cheese', 'Without cheese'].map(option => (
+                              <div key={option} className="flex items-center space-x-2 rounded-xl border border-border bg-card p-3">
+                                <RadioGroupItem value={option} id={`club_${option.toLowerCase().replaceAll(' ', '_')}`} />
+                                <Label htmlFor={`club_${option.toLowerCase().replaceAll(' ', '_')}`} className="cursor-pointer">{option}</Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <Label htmlFor="c_allergies">Allergies (Required)</Label>
                     <Input id="c_allergies" required value={formData.allergies} onChange={(e) => setFormData({...formData, allergies: e.target.value})} placeholder="Type 'None' if applicable" />
@@ -375,29 +443,24 @@ const CafePage = () => {
                     </div>
                   )}
 
+                  <TurnstileField
+                    onVerify={setCaptchaToken}
+                    onError={(message) => toast.error(message)}
+                    resetSignal={captchaResetCount}
+                  />
+
                   <div className="border-t border-border pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div className="text-lg">Total: <strong className="text-2xl text-primary font-bold">₦{calculateTotal().toLocaleString()}</strong></div>
-                    <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
+                    <div className="grid w-full gap-3 sm:w-auto">
                       <Button
                         type="submit"
                         name="submission_action"
                         value="ground"
                         disabled={loading}
-                        variant="outline"
                         onClick={() => setSubmitMode('ground')}
-                        className="w-full py-6 px-6 rounded-xl text-lg transition-all active:scale-95"
-                      >
-                        {loading && submitMode === 'ground' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay on Ground'}
-                      </Button>
-                      <Button
-                        type="submit"
-                        name="submission_action"
-                        value="online"
-                        disabled={loading}
-                        onClick={() => setSubmitMode('online')}
                         className="w-full bg-primary hover:bg-primary/90 text-white py-6 px-6 rounded-xl text-lg transition-all active:scale-95"
                       >
-                        {loading && submitMode === 'online' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay Online'}
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Place Order'}
                       </Button>
                     </div>
                   </div>
@@ -415,6 +478,3 @@ const CafePage = () => {
 };
 
 export default CafePage;
-
-
-

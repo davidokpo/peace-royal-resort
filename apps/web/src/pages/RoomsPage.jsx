@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Upload, Loader2, BedDouble } from 'lucide-react';
+import { ShieldCheck, Loader2, BedDouble } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,7 @@ import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import MediaSlideshow from '@/components/MediaSlideshow.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
+import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout.js';
@@ -23,6 +24,8 @@ const RoomsPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [submitMode, setSubmitMode] = useState('reserve');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaResetCount, setCaptchaResetCount] = useState(0);
   const [formData, setFormData] = useState({
     guest_name: '',
     email: '',
@@ -31,7 +34,6 @@ const RoomsPage = () => {
     check_out_date: '',
     room_type: '',
     special_requests: '',
-    identity_document: null,
   });
 
   const rooms = [
@@ -64,10 +66,7 @@ const RoomsPage = () => {
     },
   ];
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) setFormData({ ...formData, identity_document: file });
-  };
+  const roomTypePrice = rooms.find((room) => room.name === formData.room_type)?.price || 0;
 
   const calculateNights = () => {
     if (!formData.check_in_date || !formData.check_out_date) return 0;
@@ -77,8 +76,7 @@ const RoomsPage = () => {
 
   const calculateSubtotal = () => {
     const nights = calculateNights();
-    const roomPrice = formData.room_type === 'Executive Suite' ? 30000 : formData.room_type === 'Deluxe Room' ? 25000 : 0;
-    return nights * roomPrice;
+    return nights * roomTypePrice;
   };
 
   const calculateTax = () => Math.round(calculateSubtotal() * VAT_RATE);
@@ -94,9 +92,8 @@ const RoomsPage = () => {
       toast.error('Check-out date must be after check-in date.');
       return;
     }
-
-    if (!formData.identity_document) {
-      toast.error('Please upload your identity document.');
+    if (isTurnstileEnabled() && !captchaToken) {
+      toast.error('Please complete the captcha challenge.');
       return;
     }
 
@@ -116,16 +113,15 @@ const RoomsPage = () => {
         type: 'room',
         payment_method: paymentMethod,
         complimentary_breakfast: true,
-        identity_document_name: formData.identity_document?.name || 'No file uploaded',
       };
 
       const submission = await submitBookingRequest({
         endpoint: '/bookings/intake',
         payload: {
           bookingType: 'room',
+          captchaToken,
           data: requestData,
         },
-        fallbackRecord: requestData,
       });
 
       toast.success(
@@ -134,7 +130,7 @@ const RoomsPage = () => {
           : 'Booking saved. Please contact the hotel to confirm while online sync is being connected.',
       );
 
-      if (submission.mode === 'local_backup' || action === 'reserve') {
+      if (action === 'reserve') {
         navigate('/payment-success', {
           state: {
             booking: submission.record,
@@ -147,6 +143,7 @@ const RoomsPage = () => {
 
       const checkout = await startCheckoutOrShowPending({
         navigate,
+        requirePayment: true,
         amount: totalPrice,
         bookingId: submission.record.id,
         productName: `${formData.room_type} booking`,
@@ -166,6 +163,9 @@ const RoomsPage = () => {
       toast.error('Checkout could not be started. Please try again.');
     } finally {
       setLoading(false);
+      if (isTurnstileEnabled()) {
+        setCaptchaResetCount((count) => count + 1);
+      }
     }
   };
 
@@ -175,11 +175,11 @@ const RoomsPage = () => {
         <title>Rooms - Peace Royal Resort</title>
       </Helmet>
 
-      <div className="min-h-screen bg-[#D9C5B2]/20 organic-pattern">
+      <div className="min-h-screen bg-background">
         <Header />
         <SidebarNavigation />
 
-        <main className="lg:ml-24 pt-32 pb-24">
+        <main className="pt-32 pb-24">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h1 className="heading-font text-5xl md:text-6xl font-bold text-foreground mb-4">
@@ -226,7 +226,7 @@ const RoomsPage = () => {
                     <Button
                       onClick={() => {
                         setFormData((prev) => ({ ...prev, room_type: room.name }));
-                        document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth' });
+                        document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' });
                       }}
                       className="w-fit bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl px-8"
                     >
@@ -293,21 +293,15 @@ const RoomsPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>ID Verification (NIN / Passport)</Label>
-                  <div className="border-2 border-dashed border-primary/30 rounded-2xl p-8 text-center bg-white/30 hover:bg-white/50 transition-colors">
-                    <input type="file" id="id_upload" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} />
-                    <label htmlFor="id_upload" className="cursor-pointer flex flex-col items-center">
-                      <Upload className="w-8 h-8 text-primary mb-3" />
-                      <span className="font-medium text-foreground">{formData.identity_document ? formData.identity_document.name : 'Click to upload identity document'}</span>
-                      <span className="text-sm text-muted-foreground mt-1">Required for check-in</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
                   <Label htmlFor="special_requests">Special Requests (Optional)</Label>
                   <Textarea id="special_requests" value={formData.special_requests} onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })} className="bg-white/50 border-white/60" rows={3} placeholder="Any specific needs for your stay?" />
                 </div>
+
+                <TurnstileField
+                  onVerify={setCaptchaToken}
+                  onError={(message) => toast.error(message)}
+                  resetSignal={captchaResetCount}
+                />
 
                 {calculateNights() > 0 && formData.room_type && (
                   <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
@@ -333,27 +327,16 @@ const RoomsPage = () => {
                   </div>
                 )}
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4">
                   <Button
                     type="submit"
                     name="submission_action"
                     value="reserve"
                     disabled={loading}
-                    variant="outline"
                     onClick={() => setSubmitMode('reserve')}
-                    className="w-full py-6 text-lg rounded-xl transition-all"
-                  >
-                    {loading && submitMode === 'reserve' ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Pay on Ground'}
-                  </Button>
-                  <Button
-                    type="submit"
-                    name="submission_action"
-                    value="pay"
-                    disabled={loading}
-                    onClick={() => setSubmitMode('pay')}
                     className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground py-6 text-lg rounded-xl transition-all"
                   >
-                    {loading && submitMode === 'pay' ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Pay Online'}
+                    {loading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</> : 'Book Now'}
                   </Button>
                 </div>
               </form>

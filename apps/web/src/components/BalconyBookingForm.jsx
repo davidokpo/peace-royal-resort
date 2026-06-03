@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { submitBookingRequest } from '@/lib/bookingSubmission';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout';
+import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 
 const breakfastPackages = [
   { name: 'Therapeutic Morning Tea + Pastries', price: 8500 },
@@ -20,6 +21,8 @@ const BalconyBookingForm = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [submitMode, setSubmitMode] = useState('reserve');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaResetCount, setCaptchaResetCount] = useState(0);
   const [formData, setFormData] = useState({
     guest_name: '',
     email: '',
@@ -39,6 +42,12 @@ const BalconyBookingForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const action = e.nativeEvent?.submitter?.value || submitMode;
+
+    if (isTurnstileEnabled() && !captchaToken) {
+      toast.error('Please complete the captcha challenge.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -63,18 +72,19 @@ const BalconyBookingForm = () => {
         endpoint: '/bookings/intake',
         payload: {
           bookingType: 'balcony',
+          captchaToken,
           data: bookingData,
         },
-        fallbackRecord: bookingData,
       });
 
-      if (mode === 'local_backup' || action === 'reserve') {
+      if (action === 'reserve') {
         navigate('/payment-success', { state: { booking: record, submissionMode: mode } });
         return;
       }
 
       const checkout = await startCheckoutOrShowPending({
         navigate,
+        requirePayment: true,
         amount: totalPrice,
         bookingId: record.id,
         productName: 'Balcony breakfast booking',
@@ -87,9 +97,12 @@ const BalconyBookingForm = () => {
       }
     } catch (error) {
       console.error('Booking error:', error);
-      toast.error('Booking failed. Please try again.');
+      toast.error(error.message || 'Booking failed. Please try again.');
     } finally {
       setLoading(false);
+      if (isTurnstileEnabled()) {
+        setCaptchaResetCount((count) => count + 1);
+      }
     }
   };
 
@@ -223,40 +236,28 @@ const BalconyBookingForm = () => {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <TurnstileField
+        onVerify={setCaptchaToken}
+        onError={(message) => toast.error(message)}
+        resetSignal={captchaResetCount}
+      />
+
+      <div className="grid gap-4">
         <Button
           type="submit"
           name="submission_action"
           value="reserve"
           disabled={loading}
-          variant="outline"
           onClick={() => setSubmitMode('reserve')}
-          className="w-full transition-all duration-200 active:scale-[0.98]"
-        >
-          {loading && submitMode === 'reserve' ? (
-            <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            'Pay on Ground'
-          )}
-        </Button>
-        <Button
-          type="submit"
-          name="submission_action"
-          value="pay"
-          disabled={loading}
-          onClick={() => setSubmitMode('pay')}
           className="w-full bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-200 active:scale-[0.98]"
         >
-          {loading && submitMode === 'pay' ? (
+          {loading ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               Processing...
             </>
           ) : (
-            'Pay Online'
+            'Book Now'
           )}
         </Button>
       </div>

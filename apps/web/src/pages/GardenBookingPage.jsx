@@ -14,6 +14,7 @@ import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import MediaSlideshow from '@/components/MediaSlideshow.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
+import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout.js';
@@ -23,6 +24,8 @@ const GardenBookingPage = () => {
   const [isNightMode, setIsNightMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitMode, setSubmitMode] = useState('reserve');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaResetCount, setCaptchaResetCount] = useState(0);
   
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -41,6 +44,12 @@ const GardenBookingPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const action = e.nativeEvent?.submitter?.value || submitMode;
+
+    if (isTurnstileEnabled() && !captchaToken) {
+      toast.error('Please complete the captcha challenge.');
+      return;
+    }
+
     setLoading(true);
     try {
       const paymentMethod = action === 'pay' ? 'pay_online' : 'pay_on_ground';
@@ -63,18 +72,19 @@ const GardenBookingPage = () => {
         endpoint: '/bookings/intake',
         payload: {
           bookingType: 'garden',
+          captchaToken,
           data: bookingPayload,
         },
-        fallbackRecord: bookingPayload,
       });
 
-      if (submission.mode === 'local_backup' || action === 'reserve') {
+      if (action === 'reserve') {
         navigate('/payment-success', { state: { booking: submission.record, submissionMode: submission.mode } });
         return;
       }
 
       const checkout = await startCheckoutOrShowPending({
         navigate,
+        requirePayment: true,
         amount: PACKAGE_PRICE,
         bookingId: submission.record.id,
         productName: `${formData.event_type || 'Garden'} booking`,
@@ -90,6 +100,9 @@ const GardenBookingPage = () => {
       toast.error(error.message || 'Booking failed. Please try again.');
     } finally {
       setLoading(false);
+      if (isTurnstileEnabled()) {
+        setCaptchaResetCount((count) => count + 1);
+      }
     }
   };
 
@@ -97,13 +110,12 @@ const GardenBookingPage = () => {
     title: 'Spice & Cinema',
     desc: 'Pepper soup, outdoor movie nights under the stars.',
     media: [
+      { src: HOTEL_IMAGES.gardenBookingNight, alt: 'Nighttime garden booking view' },
       { src: '/assets/images/garden-booking-night.mp4', alt: 'Night garden cinema experience', startAt: 10, endAt: 20 },
       { src: '/assets/images/garden-filmshow.mp4', alt: 'Outdoor film show in the garden', startAt: 10, endAt: 20 },
       { src: '/assets/images/garden-events.mp4', alt: 'Evening garden event setup', startAt: 10, endAt: 20 },
-      { src: HOTEL_IMAGES.gardenBookingNight, alt: 'Nighttime garden booking view' },
     ],
-    bg: 'bg-[#2D4C3E]',
-    text: 'text-white'
+    text: 'text-foreground'
   } : {
     title: 'Deck & Dawn',
     desc: 'Card games, breakfast, and skyline views.',
@@ -114,9 +126,29 @@ const GardenBookingPage = () => {
       { src: '/assets/images/garden-games.mp4', alt: 'Garden games and hangout moment', startAt: 10, endAt: 20 },
       { src: '/assets/images/garden-events.mp4', alt: 'Garden event in daylight', startAt: 10, endAt: 20 },
     ],
-    bg: 'bg-[#D9C5B2]',
-    text: 'text-[#2D4C3E]'
+    text: 'text-foreground'
   };
+
+  const valentineEventMedia = [
+    {
+      src: '/assets/images/garden-event-valentine1.jpg',
+      alt: 'Valentine garden event decor and guest setup',
+    },
+    {
+      src: '/assets/images/garden-event-valentine2.mp4',
+      alt: 'Valentine garden event highlight video',
+      startAt: 0,
+      endAt: 14,
+      poster: '/assets/images/garden-event-valentine1.jpg',
+    },
+    {
+      src: '/assets/images/garden-event-valentine-3.mp4',
+      alt: 'Valentine evening garden celebration video',
+      startAt: 0,
+      endAt: 12,
+      poster: '/assets/images/garden-event-valentine1.jpg',
+    },
+  ];
 
   return (
     <>
@@ -124,11 +156,11 @@ const GardenBookingPage = () => {
         <title>Garden & Balcony Events — Peace Royal Resort</title>
       </Helmet>
 
-      <div className={`min-h-screen transition-colors duration-1000 ${activeContent.bg} organic-pattern`}>
+      <div className="min-h-screen bg-background">
         <Header />
         <SidebarNavigation />
 
-        <main className="lg:ml-24 pt-24 pb-24">
+        <main className="pt-24 pb-24">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {/* Toggle Hero */}
@@ -146,6 +178,8 @@ const GardenBookingPage = () => {
                     items={activeContent.media}
                     className="h-full w-full"
                     overlayClassName="bg-black/40"
+                    imageLoading="eager"
+                    imageFetchPriority="high"
                   />
                 </motion.div>
               </AnimatePresence>
@@ -153,7 +187,7 @@ const GardenBookingPage = () => {
                 <button onClick={() => setIsNightMode(false)} className={`p-3 rounded-full transition-all ${!isNightMode ? 'bg-white text-primary shadow-lg' : 'text-white hover:bg-white/20'}`}>
                   <Sun className="w-5 h-5" />
                 </button>
-                <button onClick={() => setIsNightMode(true)} className={`p-3 rounded-full transition-all ${isNightMode ? 'bg-[#FFB84D] text-black shadow-lg neon-amber' : 'text-white hover:bg-white/20'}`}>
+                <button onClick={() => setIsNightMode(true)} className={`p-3 rounded-full transition-all ${isNightMode ? 'bg-secondary text-secondary-foreground shadow-lg' : 'text-white hover:bg-white/20'}`}>
                   <Moon className="w-5 h-5" />
                 </button>
               </div>
@@ -173,14 +207,14 @@ const GardenBookingPage = () => {
             {/* Garden Party Booking Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className={activeContent.text}>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-current/10 border border-current/20 mb-6 font-semibold uppercase tracking-wider text-sm">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border mb-6 font-semibold uppercase tracking-wider text-sm">
                   <Sparkles className="w-4 h-4" /> Private Events
                 </div>
                 <h2 className="heading-font text-5xl font-bold mb-6">Host Your Squad</h2>
-                <p className="text-lg opacity-80 leading-relaxed mb-8">
+                <p className="text-lg text-muted-foreground leading-relaxed mb-8">
                   Birthdays, Proposals, or Saturday Link-ups. Book our lush garden space for an unforgettable private event. Package includes dedicated staff, atmospheric lighting, and complete privacy.
                 </p>
-                <div className="bg-current/5 border border-current/10 rounded-2xl p-6 flex items-center justify-between">
+                <div className="bg-card border border-border rounded-2xl p-6 flex items-center justify-between">
                   <span className="font-medium text-lg">Base Package</span>
                   <span className="text-3xl font-bold">₦100,000</span>
                 </div>
@@ -246,30 +280,61 @@ const GardenBookingPage = () => {
                     <Textarea rows={3} value={formData.special_requests} onChange={e=>setFormData({...formData, special_requests: e.target.value})} className="bg-white/50 mt-1" />
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <TurnstileField
+                    onVerify={setCaptchaToken}
+                    onError={(message) => toast.error(message)}
+                    resetSignal={captchaResetCount}
+                  />
+
+                  <div className="grid gap-4">
                     <Button
                       type="submit"
                       name="submission_action"
                       value="reserve"
                       disabled={loading}
-                      variant="outline"
                       onClick={() => setSubmitMode('reserve')}
-                      className="w-full h-14 rounded-xl text-lg font-medium bg-white/10 text-white border-white/20 hover:bg-white/15"
+                      className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground h-14 rounded-xl text-lg font-medium"
                     >
-                      {loading && submitMode === 'reserve' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay on Ground'}
-                    </Button>
-                    <Button
-                      type="submit"
-                      name="submission_action"
-                      value="pay"
-                      disabled={loading}
-                      onClick={() => setSubmitMode('pay')}
-                      className="w-full bg-primary hover:bg-primary/90 text-white h-14 rounded-xl text-lg font-medium"
-                    >
-                      {loading && submitMode === 'pay' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay Online'}
+                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Book Now'}
                     </Button>
                   </div>
                 </form>
+              </div>
+            </div>
+
+            <div className="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl min-h-[24rem]">
+                <MediaSlideshow
+                  items={valentineEventMedia}
+                  className="h-full min-h-[24rem] w-full"
+                  overlayClassName="bg-black/20"
+                  activateWhenInView
+                />
+              </div>
+
+              <div className={activeContent.text}>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border mb-6 font-semibold uppercase tracking-wider text-sm">
+                  <Sparkles className="w-4 h-4" /> Event Highlights
+                </div>
+                <h3 className="heading-font text-4xl md:text-5xl font-bold mb-6">Valentine Garden Moments</h3>
+                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                  These new garden event visuals now sit directly on the booking page so guests can see the atmosphere before they book.
+                  The section leans into styled celebrations, intimate evening setups, and the kind of private event energy the space can carry well.
+                </p>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-border bg-card p-4">
+                    <div className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">Mood</div>
+                    <div className="font-semibold">Romantic styling</div>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4">
+                    <div className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">Format</div>
+                    <div className="font-semibold">Photo + video story</div>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4">
+                    <div className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">Best For</div>
+                    <div className="font-semibold">Private celebrations</div>
+                  </div>
+                </div>
               </div>
             </div>
 
