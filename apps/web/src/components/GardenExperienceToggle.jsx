@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon } from 'lucide-react';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
 
-const GardenExperienceToggle = () => {
+const GardenExperienceToggle = ({ onModeChange }) => {
   const [isNightMode, setIsNightMode] = useState(() => {
     const saved = localStorage.getItem('gardenExperienceMode');
     return saved === 'night';
@@ -11,7 +11,8 @@ const GardenExperienceToggle = () => {
 
   useEffect(() => {
     localStorage.setItem('gardenExperienceMode', isNightMode ? 'night' : 'day');
-  }, [isNightMode]);
+    onModeChange?.(isNightMode ? 'night' : 'day');
+  }, [isNightMode, onModeChange]);
 
   const dayContent = {
     title: 'Social Balcony',

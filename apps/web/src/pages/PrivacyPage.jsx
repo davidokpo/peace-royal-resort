@@ -50,29 +50,32 @@ const sections = [
 const PrivacyPage = () => (
   <>
     <Helmet>
-      <title>Privacy Policy - Peace Royal Resort</title>
+      <title>Privacy Notice - Peace Royal Resort</title>
       <meta
         name="description"
-        content="Privacy policy for bookings, payments, storage, and communications at Peace Royal Resort."
+        content="Privacy notice for bookings, payments, cookies, storage, and communications at Peace Royal Resort."
       />
     </Helmet>
 
-    <div className="min-h-screen bg-[#EEF2E6] organic-pattern">
+    <div className="min-h-screen bg-background">
       <Header />
       <SidebarNavigation />
 
-      <main className="lg:ml-24 pt-32 pb-24">
+      <main className="pt-32 pb-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 rounded-[2rem] border border-[#58705B]/10 bg-white/80 p-8 shadow-[0_18px_60px_rgba(40,61,44,0.10)] backdrop-blur-md md:p-12">
-            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#58705B]">
+          <div className="mb-12 rounded-[2rem] border border-border/60 bg-card/80 p-8 shadow-[0_18px_60px_rgba(40,61,44,0.10)] backdrop-blur-md md:p-12">
+            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary/80">
               Legal
             </p>
-            <h1 className="heading-font mt-4 text-4xl font-bold text-[#2F3A2F] md:text-5xl">
-              Privacy Policy
+            <h1 className="heading-font mt-4 text-4xl font-bold text-foreground md:text-5xl">
+              Privacy Notice
             </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-[#566156]">
+            <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">
               This policy explains how Peace Royal Resort handles reservation,
               payment, and contact data submitted through the website.
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Last updated: May 6, 2026
             </p>
           </div>
 
@@ -80,12 +83,12 @@ const PrivacyPage = () => (
             {sections.map((section) => (
               <section
                 key={section.title}
-                className="rounded-[1.75rem] border border-[#58705B]/10 bg-white/75 p-6 shadow-[0_12px_40px_rgba(40,61,44,0.08)] backdrop-blur-sm md:p-8"
+                className="rounded-[1.75rem] border border-border/60 bg-card/75 p-6 shadow-[0_12px_40px_rgba(40,61,44,0.08)] backdrop-blur-sm md:p-8"
               >
-                <h2 className="heading-font text-2xl font-bold text-[#2F3A2F]">
+                <h2 className="heading-font text-2xl font-bold text-foreground">
                   {section.title}
                 </h2>
-                <p className="mt-3 text-base leading-7 text-[#546053]">
+                <p className="mt-3 text-base leading-7 text-muted-foreground">
                   {section.body}
                 </p>
               </section>

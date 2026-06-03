@@ -16,7 +16,7 @@ const PaymentCancel = () => {
         <meta name="description" content="Your payment was not completed. You can try again or contact us for assistance." />
       </Helmet>
 
-      <div className="min-h-screen bg-background leaf-pattern">
+      <div className="min-h-screen bg-background dot-pattern">
         <Header />
 
         <main className="pt-32 pb-20">

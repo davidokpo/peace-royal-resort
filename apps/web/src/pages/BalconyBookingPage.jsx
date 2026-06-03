@@ -4,6 +4,7 @@ import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import BalconyBookingForm from '@/components/BalconyBookingForm.jsx';
+import { HOTEL_IMAGES } from '@/config/siteContent.js';
 
 const BalconyBookingPage = () => {
   return (
@@ -13,11 +14,11 @@ const BalconyBookingPage = () => {
         <meta name="description" content="Reserve your spot on our Social Balcony for therapeutic breakfasts and skyline views." />
       </Helmet>
 
-      <div className="min-h-screen bg-background organic-pattern">
+      <div className="min-h-screen bg-background dot-pattern">
         <Header />
         <SidebarNavigation />
 
-        <main className="lg:ml-20 pb-20 lg:pb-0 pt-32">
+        <main className="pb-20 lg:pb-0 pt-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h1 className="heading-font text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -26,6 +27,16 @@ const BalconyBookingPage = () => {
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Enjoy breakfast and card games with a stunning view of the Gwarimpa skyline.
               </p>
+            </div>
+
+            <div className="mb-12 overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-xl">
+              <img
+                src={HOTEL_IMAGES.balconyPhoto}
+                alt="Peace Royal Resort balcony"
+                className="h-[320px] w-full object-cover md:h-[420px]"
+                loading="eager"
+                fetchPriority="high"
+              />
             </div>
             
             <BalconyBookingForm />

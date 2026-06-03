@@ -5,6 +5,26 @@
   "outputDirectory": "dist",
   "routes": [
     {
+      "src": "/api/health",
+      "dest": "/api/health.js"
+    },
+    {
+      "src": "/api/bookings/intake",
+      "dest": "/api/bookings/intake.js"
+    },
+    {
+      "src": "/api/paystack/create-checkout",
+      "dest": "/api/paystack/create-checkout.js"
+    },
+    {
+      "src": "/api/paystack/verify",
+      "dest": "/api/paystack/verify.js"
+    },
+    {
+      "src": "/api/paystack/webhook",
+      "dest": "/api/paystack/webhook.js"
+    },
+    {
       "handle": "filesystem"
     },
     {

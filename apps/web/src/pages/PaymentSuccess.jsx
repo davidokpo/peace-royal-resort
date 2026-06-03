@@ -45,7 +45,7 @@ const PaymentSuccess = () => {
 
     const verifyPayment = async () => {
       try {
-        const response = await apiServerClient.fetch(`/paystack/verify/${encodeURIComponent(paymentReference)}`);
+        const response = await apiServerClient.fetch(`/paystack/verify?reference=${encodeURIComponent(paymentReference)}`);
         const result = await response.json().catch(() => ({}));
 
         if (!response.ok || !result?.verified || cancelled) {
@@ -87,17 +87,12 @@ const PaymentSuccess = () => {
 
   const booking = data?.booking;
   const order = data?.order;
-  const submissionMode =
-    data?.submissionMode ||
-    booking?.submissionMode ||
-    order?.submissionMode ||
-    'api';
-  const isLocalBackup = submissionMode === 'local_backup';
   const paymentMethod = booking?.payment_method || order?.payment_method || '';
   const paymentStatus = booking?.payment_status || order?.payment_status || 'pending';
-  const hasPaymentReference = Boolean(data?.paymentReference);
   const isPayOnGround = paymentMethod === 'pay_on_ground';
-  const isPaidOnline = paymentStatus === 'paid' || data?.paymentVerified === true || hasPaymentReference;
+  const isPaidOnline = paymentStatus === 'paid' || data?.paymentVerified === true;
+  const hasPaymentReference = Boolean(data?.paymentReference);
+  const isAwaitingOnlineConfirmation = !isPayOnGround && !isPaidOnline && hasPaymentReference;
   const paidLabel = isPayOnGround
     ? 'Pay on ground'
     : isPaidOnline
@@ -211,7 +206,7 @@ const PaymentSuccess = () => {
         <meta name="description" content="Your booking or order has been received successfully. Thank you for choosing Peace Royal Resort." />
       </Helmet>
 
-      <div className="min-h-screen bg-background leaf-pattern">
+      <div className="min-h-screen bg-background dot-pattern">
         <Header />
 
         <main className="pt-32 pb-20">
@@ -227,16 +222,16 @@ const PaymentSuccess = () => {
               </div>
 
               <h1 className="heading-font text-3xl md:text-4xl font-bold text-foreground mb-4">
-                {isLocalBackup ? 'Booking request saved' : isPaidOnline ? 'Payment received' : 'Booking received'}
+                {isPaidOnline ? 'Payment received' : isAwaitingOnlineConfirmation ? 'Payment submitted' : 'Booking received'}
               </h1>
               <p className="text-lg text-muted-foreground mb-8">
-                {isLocalBackup
-                  ? `Your ${details.type.toLowerCase()} has been saved on this device. Please contact the hotel directly to confirm it while the live online booking connection is being completed.`
-                  : isPaidOnline
-                    ? `Your ${details.type.toLowerCase()} has been received and your online payment has been recorded successfully.`
-                    : isPayOnGround
-                      ? `Your ${details.type.toLowerCase()} has been received. You selected pay on ground, so our team will confirm the cash payment step with you.`
-                      : `Your ${details.type.toLowerCase()} has been received. Our team will review it and contact you to confirm the next step.`}
+                {isPaidOnline
+                  ? `Your ${details.type.toLowerCase()} has been received and your online payment has been recorded successfully.`
+                  : isAwaitingOnlineConfirmation
+                    ? `Your ${details.type.toLowerCase()} has been received and your payment reference was captured. We are still confirming the Paystack result before marking it as paid.`
+                  : isPayOnGround
+                    ? `Your ${details.type.toLowerCase()} has been received. You selected pay on ground, so our team will confirm the cash payment step with you.`
+                    : `Your ${details.type.toLowerCase()} has been received. Our team will review it and contact you to confirm the next step.`}
               </p>
 
               <div className="bg-card rounded-xl p-6 mb-8 text-left">
@@ -274,13 +269,13 @@ const PaymentSuccess = () => {
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2"></span>
                     <span>
-                      {isLocalBackup
-                        ? `Call ${HOTEL_CONTACT.phoneDisplay} or email ${HOTEL_CONTACT.email} so the team can confirm this saved request manually`
-                        : isPayOnGround
-                          ? 'Our team will contact you shortly to confirm arrangements and where you will complete payment on ground'
-                          : isPaidOnline
-                            ? 'Our team will contact you shortly to confirm arrangements linked to your successful online payment'
-                            : 'Our team will contact you shortly to confirm arrangements and the next step'}
+                      {isPayOnGround
+                        ? 'Our team will contact you shortly to confirm arrangements and where you will complete payment on ground'
+                        : isPaidOnline
+                          ? 'Our team will contact you shortly to confirm arrangements linked to your successful online payment'
+                          : isAwaitingOnlineConfirmation
+                            ? 'Keep the payment reference while our system confirms the Paystack transaction and updates your booking status'
+                          : 'Our team will contact you shortly to confirm arrangements and the next step'}
                     </span>
                   </li>
                   <li className="flex items-start gap-2">

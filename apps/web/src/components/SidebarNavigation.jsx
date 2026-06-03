@@ -20,7 +20,7 @@ const SidebarNavigation = () => {
 
   return (
     <>
-      <aside className="hidden lg:flex flex-col fixed left-0 top-24 bottom-0 w-24 glassmorphic-panel border-r border-border z-40 bg-background/60">
+      <aside className="hidden flex-col fixed left-0 top-24 bottom-0 w-24 glassmorphic-panel border-r border-border z-40 bg-background/60">
         <div className="flex justify-center pt-6 pb-2">
           <Link to="/" aria-label="Home">
             <Logo size="small" lightBg={true} className="hover:scale-110 transition-transform duration-300" />
@@ -58,7 +58,7 @@ const SidebarNavigation = () => {
       </aside>
 
       {/* Mobile bottom nav */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 glassmorphic-panel border-t border-border z-40 pb-safe">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 glassmorphic-panel z-40 pb-safe">
         <nav className="flex items-center justify-around py-3 px-2 overflow-x-auto gap-2">
           {navItems.map((item) => {
             const Icon = item.icon;

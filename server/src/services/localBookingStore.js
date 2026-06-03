@@ -1,10 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dataDir = path.resolve(__dirname, '../../data');
+const dataDir = path.resolve(process.cwd(), 'api/data');
 const dataFile = path.join(dataDir, 'bookings.json');
 
 const ensureStore = async () => {

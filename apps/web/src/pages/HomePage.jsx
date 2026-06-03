@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
-import Logo from '@/components/Logo.jsx';
 import { HOTEL_IMAGES, HOTEL_CONTACT } from '@/config/siteContent.js';
 
 const HomePage = () => {
@@ -21,11 +20,11 @@ const HomePage = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-background organic-pattern">
+      <div className="min-h-screen bg-background w-full">
         <Header />
         <SidebarNavigation />
 
-        <main className="lg:ml-24 pb-20 lg:pb-0">
+        <main className="pb-20 lg:pb-0 w-full">
           <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
             <div className="absolute inset-0">
               <img
@@ -34,38 +33,35 @@ const HomePage = () => {
                 className="w-full h-full object-cover object-center"
                 fetchPriority="high"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/65 to-primary/20"></div>
+              <div className="absolute inset-0 bg-black/30"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/65 to-primary/20 w-full"></div>
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20">
+            <div className="relative z-10 max-w-7xl mx-auto w-full px-5 sm:px-6 lg:px-8 pt-28 pb-14 sm:pt-32 sm:pb-20 md:py-24">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
-                className="max-w-2xl"
+                className="w-full max-w-2xl"
               >
-                <div className="mb-8">
-                  <Logo size="large" lightBg={false} className="origin-left scale-75 md:scale-100" />
-                </div>
-
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-sm mb-6">
                   <Sparkles className="w-4 h-4 text-secondary" />
                   <span>Nature-inspired luxury</span>
                 </div>
-                <h1 className="heading-font text-5xl md:text-7xl font-bold text-white mb-6 text-balance leading-[1.1]" style={{ letterSpacing: '-0.02em' }}>
+                <h1 className="heading-font text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-6 text-balance leading-[1.1]" style={{ letterSpacing: '-0.02em' }}>
                   Home of Peace<br />Baile na Siochana
                 </h1>
-                <p className="text-xl md:text-2xl text-white/80 mb-10 leading-relaxed font-light text-balance">
+                <p className="text-lg sm:text-xl md:text-2xl text-white/80 mb-8 sm:mb-10 leading-relaxed font-light text-balance">
                   Where mornings taste like peace and nights feel like home.
                 </p>
-                <p className="text-sm md:text-base text-white/85 mb-8">
+                <p className="text-sm md:text-base text-white/85 mb-8 sm:mb-10">
                   {HOTEL_CONTACT.address}
                 </p>
-                <div className="flex flex-wrap gap-4">
-                  <Button asChild size="lg" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-base px-8 py-6 rounded-xl transition-all duration-300 active:scale-[0.98] shadow-lg shadow-secondary/20">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
+                  <Button asChild size="lg" className="w-full sm:w-auto justify-center bg-secondary hover:bg-secondary/90 text-secondary-foreground text-base px-8 py-6 rounded-xl transition-all duration-300 active:scale-[0.98] shadow-lg shadow-secondary/20">
                     <Link to="/rooms">Reserve a room</Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 text-base px-8 py-6 rounded-xl transition-all duration-300 active:scale-[0.98]">
+                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto justify-center bg-white/5 backdrop-blur-md border-white/40 text-white hover:bg-white/10 text-base px-8 py-6 rounded-xl transition-all duration-300 active:scale-[0.98]">
                     <Link to="/garden">Explore garden</Link>
                   </Button>
                 </div>
@@ -84,15 +80,11 @@ const HomePage = () => {
                   className="relative order-2 lg:order-1"
                 >
                   <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl relative z-10">
-                    <video
-                      src={`${HOTEL_IMAGES.homeBalcony}#t=12,24`}
+                    <img
+                      src={HOTEL_IMAGES.balconyPhoto}
+                      alt="Peace Royal Resort balcony"
                       className="w-full h-full object-cover"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                      poster={HOTEL_IMAGES.homeHero}
+                      loading="lazy"
                     />
                   </div>
                   <div className="absolute -inset-4 bg-muted rounded-3xl -z-10 transform translate-x-4 translate-y-6"></div>
@@ -151,7 +143,7 @@ const HomePage = () => {
             </div>
           </section>
 
-          <section className="py-24 organic-pattern">
+          <section className="py-24">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
                 <h2 className="heading-font text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
@@ -191,7 +183,6 @@ const HomePage = () => {
           </section>
 
           <section className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
-            <div className="absolute inset-0 organic-pattern-dark opacity-50"></div>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
               <Briefcase className="w-12 h-12 mx-auto mb-6 text-accent" />
               <h2 className="heading-font text-3xl md:text-4xl font-bold mb-6 text-balance">

@@ -1,10 +1,23 @@
-.vercel/
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 apps/web/dist/
-package-lock.json
+
+# Vercel
+.vercel/
+.vercel
+
+# Environment variables (keep .env.example templates)
 .env
 .env.*
 !.env.example
 !.env.*.example
+
+# Local runtime data (may contain customer PII)
+api/data/
+
+# Lockfiles / logs
+package-lock.json
 *.log

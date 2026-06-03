@@ -13,6 +13,7 @@ export default defineConfig({
     },
   },
   build: {
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -47,8 +48,6 @@ export default defineConfig({
           if (id.includes('pocketbase')) {
             return 'pocketbase';
           }
-
-          return 'vendor';
         },
       },
     },

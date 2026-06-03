@@ -10,14 +10,14 @@ const Logo = ({ size = 'medium', className, lightBg = false }) => {
 
   return (
     <div className={cn(
-      'relative flex items-center justify-center flex-shrink-0 rounded-full bg-white shadow-md overflow-hidden', 
+      'relative flex items-center justify-center flex-shrink-0 overflow-hidden', 
       sizeClasses[size], 
       className
     )}>
       <img
         src="https://horizons-cdn.hostinger.com/f4103959-de74-4f2a-8ed2-ca305fdcf13f/fd85ff2ce773a8ea96e6754ec94fb147.png"
         alt="Peace Royal Resort Logo"
-        className="w-full h-full object-contain p-1"
+        className="w-full h-full object-contain"
       />
     </div>
   );

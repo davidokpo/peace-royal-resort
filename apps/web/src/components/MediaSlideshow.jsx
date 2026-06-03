@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -46,16 +46,50 @@ const MediaSlideshow = ({
   overlayClassName = '',
   showDots = true,
   autoPlay = true,
+  imageLoading = 'lazy',
+  imageFetchPriority = 'auto',
+  activateWhenInView = false,
+  inViewMargin = '240px',
 }) => {
   const slides = useMemo(() => items.filter(Boolean), [items]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isInView, setIsInView] = useState(!activateWhenInView);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     setActiveIndex(0);
   }, [slides.length]);
 
   useEffect(() => {
-    if (!autoPlay || slides.length <= 1) {
+    if (!activateWhenInView) {
+      setIsInView(true);
+      return undefined;
+    }
+
+    const node = containerRef.current;
+
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setIsInView(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: inViewMargin }
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [activateWhenInView, inViewMargin]);
+
+  useEffect(() => {
+    if (!autoPlay || !isInView || slides.length <= 1) {
       return undefined;
     }
 
@@ -84,8 +118,8 @@ const MediaSlideshow = ({
   };
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
-      {mediaType === 'video' ? (
+    <div ref={containerRef} className={`relative overflow-hidden ${className}`}>
+      {isInView && mediaType === 'video' ? (
         <video
           key={activeSlide.src}
           src={getVideoSrc(activeSlide)}
@@ -100,11 +134,12 @@ const MediaSlideshow = ({
       ) : (
         <img
           key={activeSlide.src}
-          src={activeSlide.src}
+          src={activeSlide.poster || activeSlide.src}
           alt={activeSlide.alt}
           className="h-full w-full object-cover"
-          loading="lazy"
+          loading={imageLoading}
           decoding="async"
+          fetchPriority={imageFetchPriority}
         />
       )}
 

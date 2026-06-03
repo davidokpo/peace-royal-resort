@@ -15,6 +15,7 @@ export const HOTEL_SOCIALS = {
 export const HOTEL_IMAGES = {
   homeHero: '/assets/images/home-hero.jpg',
   homeBalcony: '/assets/images/home-balcony.MOV',
+  balconyPhoto: '/assets/images/Balcony.jpg',
   socialHero: '/assets/images/social-hero.jpg',
   gardenDay: '/assets/images/garden-day.jpg',
   gardenNight: '/assets/images/garden-night.svg',
