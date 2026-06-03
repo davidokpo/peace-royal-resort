@@ -462,22 +462,12 @@ const getSheetsClient = async () => {
   return google.sheets({ version: 'v4', auth });
 };
 
-const getSpreadsheetIdForType = (bookingOrType) => {
-  const type =
-    typeof bookingOrType === 'string'
-      ? normalizeBookingType(bookingOrType)
-      : normalizeBookingType(bookingOrType?.type || bookingOrType?.booking_type);
-
-  if (type === 'cafe') {
-    return process.env.GOOGLE_SHEETS_CAFE_SPREADSHEET_ID || process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-  }
-
-  if (type === 'restaurant') {
-    return process.env.GOOGLE_SHEETS_RESTAURANT_SPREADSHEET_ID || process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-  }
-
-  return process.env.GOOGLE_SHEETS_FRONTDESK_SPREADSHEET_ID || process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-};
+// Every booking type is recorded as its own tab inside the single main
+// booking spreadsheet (the one with the Room/Garden/Cafe tabs). Restaurant,
+// cafe, etc. all land here rather than in separate spreadsheet files, so the
+// front desk has one place to look. The per-category *_SPREADSHEET_ID env
+// vars are intentionally no longer used.
+const getSpreadsheetIdForType = () => process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
 
 const toColumnLetter = (columnNumber) => {
   let value = columnNumber;

@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
+import MenuItemCard from '@/components/MenuItemCard.jsx';
 import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout.js';
@@ -60,6 +61,18 @@ const RestaurantPage = () => {
         return copy;
       }
       return { ...prev, [item.id]: next };
+    });
+  };
+
+  const setCartQuantity = (item, qty) => {
+    setCart((prev) => {
+      const copy = { ...prev };
+      if (qty <= 0) {
+        delete copy[item.id];
+      } else {
+        copy[item.id] = qty;
+      }
+      return copy;
     });
   };
 
@@ -168,32 +181,15 @@ const RestaurantPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
               {menuItems.map((item) => (
-                <div key={item.id} className={`glassmorphic-card rounded-2xl overflow-hidden flex flex-col ${item.highlight ? 'ring-2 ring-secondary/30' : ''}`}>
-                  <div className="h-48 relative">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
-                    {item.highlight ? (
-                      <div className="absolute top-3 right-3 bg-secondary text-white text-xs font-bold px-3 py-1 rounded-full">
-                        Evening Favorite
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="p-5 flex flex-col flex-grow">
-                    <h3 className="font-bold text-lg mb-2 text-foreground">{item.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 flex-grow">{item.desc}</p>
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/20">
-                      <span className="font-bold text-secondary">N{item.price.toLocaleString()}</span>
-                      <div className="flex items-center gap-3 bg-white/40 rounded-full px-2 py-1">
-                        <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-white/50 rounded-full transition-colors">
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="text-sm font-medium w-4 text-center">{cart[item.id] || 0}</span>
-                        <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-white/50 rounded-full transition-colors">
-                          <Plus className="w-4 h-4 text-secondary" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <MenuItemCard
+                  key={item.id}
+                  item={item}
+                  quantity={cart[item.id] || 0}
+                  onConfirm={setCartQuantity}
+                  imageHeightClass="h-48"
+                  accentClassName="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                  badgeText={item.highlight ? 'Evening Favorite' : undefined}
+                />
               ))}
             </div>
 

@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import MediaSlideshow from '@/components/MediaSlideshow.jsx';
+import MenuItemCard from '@/components/MenuItemCard.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
@@ -47,22 +48,22 @@ const CafePage = () => {
   const CLUB_SANDWICH_ITEM_ID = 15;
 
   const cafeItems = [
-    { id: 1, category: 'Signature Tea', name: 'Bubble Tea', price: 3000, img: '/assets/images/menu-green-smoothie.svg', desc: 'Creamy chilled tea with a playful textured finish.' },
-    { id: 2, category: 'Signature Tea', name: 'Green Tea', price: 1200, img: '/assets/images/menu-matcha-latte.svg', desc: 'Clean and calming tea for a light midday reset.' },
-    { id: 3, category: 'Signature Tea', name: 'Evening Paradise Tea / Peace Royal Resort Special', price: 2500, img: '/assets/images/menu-chamomile-tea.svg', desc: 'Our house evening tea blend crafted for deep calm and slow nights.', night: true },
-    { id: 4, category: 'Signature Tea', name: 'Flavored Tea', price: 1800, img: '/assets/images/menu-chamomile-tea.svg', desc: 'Infused with lemon, honey, or fruit flavors.' },
-    { id: 5, category: 'Coffee', name: 'Artisan Espresso', price: 1000, img: '/assets/images/menu-artisan-espresso.svg', desc: 'Bold short coffee for focused work blocks.' },
-    { id: 6, category: 'Tea Latte', name: 'Matcha Latte', price: 1800, img: '/assets/images/menu-matcha-latte.svg', desc: 'Earthy green tea latte with a smooth finish.' },
-    { id: SMOOTHIE_ITEM_ID, category: 'Fresh Blend', name: 'Fresh Fruit Smoothie', price: 2500, img: '/assets/images/menu-green-smoothie.svg', desc: 'Choose banana, pineapple, watermelon, or a fresh mix of all three.' },
-    { id: 8, category: 'Pastry', name: 'Meat Pie', price: 1500, img: '/assets/images/restaurant-main.svg', desc: 'Flaky pastry with a rich savory meat filling.' },
-    { id: 9, category: 'Pastry', name: 'Chicken Pie', price: 1700, img: '/assets/images/restaurant-main.svg', desc: 'Buttery pastry filled with seasoned chicken.' },
-    { id: 10, category: 'Pastry', name: 'Fish Pie', price: 1500, img: '/assets/images/restaurant-main.svg', desc: 'Golden pastry stuffed with a savory fish filling.' },
-    { id: 11, category: 'Snack', name: 'Small Chops', price: 3500, img: '/assets/images/restaurant-main.svg', desc: 'A mixed tray of crisp samosa, spring rolls, and puff-puff for easy sharing.' },
-    { id: 14, category: 'Pastry', name: 'Doughnut', price: 800, img: '/assets/images/restaurant-main.svg', desc: 'Classic soft doughnut for a quick sweet break.' },
-    { id: CLUB_SANDWICH_ITEM_ID, category: 'Snack', name: 'Club Sandwich', price: 2000, img: '/assets/images/restaurant-main.svg', desc: 'Layered sandwich for a fuller cafe meal, with or without cheese.' },
-    { id: 16, category: 'Breakfast', name: 'Pancake', price: 500, img: '/assets/images/restaurant-main.svg', desc: 'Soft fresh pancake served warm.' },
-    { id: 17, category: 'Breakfast', name: 'Pancake with Topping', price: 700, img: '/assets/images/restaurant-main.svg', desc: 'Warm pancake finished with your topping.' },
-    { id: 18, category: 'Breakfast', name: '6 Pancakes with Topping', price: 4000, img: '/assets/images/restaurant-main.svg', desc: 'A full pack of six pancakes with topping for sharing.' },
+    { id: 1, category: 'Signature Tea', name: 'Bubble Tea', price: 3000, img: '/assets/images/cafe-bubble-tea.jpg', desc: 'Creamy chilled tea with a playful textured finish.' },
+    { id: 2, category: 'Signature Tea', name: 'Green Tea', price: 1200, img: '/assets/images/cafe-green-tea.jpg', desc: 'Clean and calming tea for a light midday reset.' },
+    { id: 3, category: 'Signature Tea', name: 'Evening Paradise Tea / Peace Royal Resort Special', price: 2500, img: '/assets/images/cafe-herbal-tea.jpg', desc: 'Our house evening tea blend crafted for deep calm and slow nights.', night: true },
+    { id: 4, category: 'Signature Tea', name: 'Flavored Tea', price: 1800, img: '/assets/images/cafe-flavored-tea.jpg', desc: 'Infused with lemon, honey, or fruit flavors.' },
+    { id: 5, category: 'Coffee', name: 'Artisan Espresso', price: 1000, img: '/assets/images/cafe-espresso.jpg', desc: 'Bold short coffee for focused work blocks.' },
+    { id: 6, category: 'Tea Latte', name: 'Matcha Latte', price: 1800, img: '/assets/images/cafe-matcha-latte.jpg', desc: 'Earthy green tea latte with a smooth finish.' },
+    { id: SMOOTHIE_ITEM_ID, category: 'Fresh Blend', name: 'Fresh Fruit Smoothie', price: 2500, img: '/assets/images/cafe-smoothie.jpg', desc: 'Choose banana, pineapple, watermelon, or a fresh mix of all three.' },
+    { id: 8, category: 'Pastry', name: 'Meat Pie', price: 1500, img: '/assets/images/cafe-pie.jpg', desc: 'Flaky pastry with a rich savory meat filling.' },
+    { id: 9, category: 'Pastry', name: 'Chicken Pie', price: 1700, img: '/assets/images/cafe-pie.jpg', desc: 'Buttery pastry filled with seasoned chicken.' },
+    { id: 10, category: 'Pastry', name: 'Fish Pie', price: 1500, img: '/assets/images/cafe-pie.jpg', desc: 'Golden pastry stuffed with a savory fish filling.' },
+    { id: 11, category: 'Snack', name: 'Small Chops', price: 3500, img: '/assets/images/cafe-small-chops.jpg', desc: 'A mixed tray of crisp samosa, spring rolls, and puff-puff for easy sharing.' },
+    { id: 14, category: 'Pastry', name: 'Doughnut', price: 800, img: '/assets/images/cafe-doughnut.jpg', desc: 'Classic soft doughnut for a quick sweet break.' },
+    { id: CLUB_SANDWICH_ITEM_ID, category: 'Snack', name: 'Club Sandwich', price: 2000, img: '/assets/images/cafe-club-sandwich.jpg', desc: 'Layered sandwich for a fuller cafe meal, with or without cheese.' },
+    { id: 16, category: 'Breakfast', name: 'Pancake', price: 500, img: '/assets/images/cafe-pancake.jpg', desc: 'Soft fresh pancake served warm.' },
+    { id: 17, category: 'Breakfast', name: 'Pancake with Topping', price: 700, img: '/assets/images/cafe-pancake.jpg', desc: 'Warm pancake finished with your topping.' },
+    { id: 18, category: 'Breakfast', name: '6 Pancakes with Topping', price: 4000, img: '/assets/images/cafe-pancake.jpg', desc: 'A full pack of six pancakes with topping for sharing.' },
   ];
 
   const workspaceMedia = [
@@ -94,6 +95,18 @@ const CafePage = () => {
         return copy;
       }
       return { ...prev, [item.id]: next };
+    });
+  };
+
+  const setCartQuantity = (item, qty) => {
+    setCart(prev => {
+      const copy = { ...prev };
+      if (qty <= 0) {
+        delete copy[item.id];
+      } else {
+        copy[item.id] = qty;
+      }
+      return copy;
     });
   };
 
@@ -233,31 +246,13 @@ const CafePage = () => {
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {featuredCafeItems.map(item => (
-                      <div key={item.id} className={`bg-card/85 backdrop-blur-md rounded-2xl overflow-hidden border border-border/60 flex flex-col justify-between shadow-sm ${item.night ? 'ring-1 ring-primary/20' : ''}`}>
-                        <div className="relative h-40">
-                          <img src={item.img} alt={item.name} className="h-full w-full object-cover" loading="lazy" />
-                          {item.night && (
-                            <div className="absolute right-3 top-3 rounded-full bg-background/85 p-2 shadow-sm">
-                              <Moon className="w-4 h-4 text-primary" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-1 flex-col p-5">
-                          <div className="mb-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.category}</p>
-                            <h3 className="font-semibold text-foreground">{item.name}</h3>
-                            <p className="mt-2 text-sm text-muted-foreground">{item.desc}</p>
-                          </div>
-                          <div className="flex justify-between items-center mt-auto">
-                          <span className="font-medium text-foreground">N{item.price.toLocaleString()}</span>
-                          <div className="flex items-center gap-2 bg-muted rounded-full px-2 py-1">
-                            <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-background rounded-full"><Minus className="w-3 h-3" /></button>
-                            <span className="text-sm font-medium w-4 text-center text-foreground">{cart[item.id] || 0}</span>
-                            <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-background rounded-full"><Plus className="w-3 h-3 text-primary" /></button>
-                          </div>
-                          </div>
-                        </div>
-                      </div>
+                      <MenuItemCard
+                        key={item.id}
+                        item={item}
+                        quantity={cart[item.id] || 0}
+                        onConfirm={setCartQuantity}
+                        imageHeightClass="h-40"
+                      />
                     ))}
                   </div>
                 </motion.div>
@@ -268,26 +263,13 @@ const CafePage = () => {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {secondaryCafeItems.map(item => (
-                      <div key={item.id} className={`bg-card/85 backdrop-blur-md rounded-2xl overflow-hidden border border-border/60 flex flex-col justify-between shadow-sm ${item.night ? 'ring-1 ring-primary/20' : ''}`}>
-                        <div className="relative h-32">
-                          <img src={item.img} alt={item.name} className="h-full w-full object-cover" loading="lazy" />
-                        </div>
-                        <div className="flex flex-1 flex-col p-4">
-                          <div className="mb-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.category}</p>
-                            <h3 className="font-semibold text-foreground">{item.name}</h3>
-                            <p className="mt-2 text-sm text-muted-foreground">{item.desc}</p>
-                          </div>
-                          <div className="mt-auto flex items-center justify-between gap-3">
-                            <span className="font-medium text-foreground">N{item.price.toLocaleString()}</span>
-                            <div className="flex items-center gap-2 bg-muted rounded-full px-2 py-1">
-                              <button type="button" onClick={() => updateCart(item, -1)} className="p-1 hover:bg-background rounded-full"><Minus className="w-3 h-3" /></button>
-                              <span className="text-sm font-medium w-4 text-center text-foreground">{cart[item.id] || 0}</span>
-                              <button type="button" onClick={() => updateCart(item, 1)} className="p-1 hover:bg-background rounded-full"><Plus className="w-3 h-3 text-primary" /></button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <MenuItemCard
+                        key={item.id}
+                        item={item}
+                        quantity={cart[item.id] || 0}
+                        onConfirm={setCartQuantity}
+                        imageHeightClass="h-32"
+                      />
                     ))}
                   </div>
                 </motion.div>
