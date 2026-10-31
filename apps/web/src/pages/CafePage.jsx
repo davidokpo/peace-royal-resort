@@ -69,8 +69,7 @@ const CafePage = () => {
   const workspaceMedia = [
     { src: '/assets/images/cafe-workspace.svg', alt: 'Cafe workspace preview' },
     { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe workspace video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-workspace.svg' },
-    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe event energy', startAt: 12, endAt: 22, poster: '/assets/images/cafe-workspace.svg' },
-    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe games video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-games.svg' },
+        { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe games video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-games.svg' },
   ];
 
   const featuredCafeItems = cafeItems.slice(0, 8);
@@ -81,8 +80,7 @@ const CafePage = () => {
   const gameNightMedia = [
     { src: '/assets/images/cafe-games.svg', alt: 'Cafe game night preview' },
     { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe game night video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-games.svg' },
-    { src: '/assets/images/Let_coffee_connect_us.MOV', alt: 'Cafe group gaming clip', startAt: 12, endAt: 22, poster: '/assets/images/cafe-workspace.svg' },
-    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe social workspace event video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-workspace.svg' },
+        { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe social workspace event video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-workspace.svg' },
   ];
 
   const updateCart = (item, delta) => {

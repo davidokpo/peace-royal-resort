@@ -2,140 +2,160 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Tv, Zap, BedDouble, Plane, Briefcase, Sparkles, Sunrise } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Tv, Zap, BedDouble, Plane, Briefcase, ArrowUpRight, Compass, Sparkles } from 'lucide-react';
 import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import { HOTEL_IMAGES, HOTEL_CONTACT } from '@/config/siteContent.js';
 
 const HomePage = () => {
+  const amenities = [
+    { icon: Tv, title: 'Smart Entertainment', desc: '4K Smart TVs with Netflix & Live Football streaming' },
+    { icon: Zap, title: 'Uninterrupted Solar', desc: '24/7 clean solar inverter & dedicated generator backup' },
+    { icon: BedDouble, title: 'Orthopedic Sleep', desc: 'Hotel-grade pocket spring mattresses for deep restoration' },
+    { icon: Plane, title: 'Chauffeured Pickup', desc: 'Punctual airport arrivals & VIP dispatch upon request' },
+  ];
+
+  const spaces = [
+    {
+      title: 'Sanctuary Rooms',
+      desc: 'Minimalist restraint, premium linens, and quiet comfort.',
+      link: '/rooms',
+      badge: 'From ₦50,000/night',
+      image: HOTEL_IMAGES.roomExecutive
+    },
+    {
+      title: 'The Restaurant',
+      desc: 'Authentic African culinary art and fresh regional specials.',
+      link: '/restaurant',
+      badge: 'All-Day Dining',
+      image: HOTEL_IMAGES.foodJollof
+    },
+    {
+      title: 'Artisan Cafe & Terrace',
+      desc: 'Freshly brewed single-origin roasts, matcha, and board games.',
+      link: '/cafe',
+      badge: 'Open Daily',
+      image: HOTEL_IMAGES.cafeWorkspace
+    },
+  ];
+
   return (
     <>
       <Helmet>
-        <title>Home - Peace Royal Resort</title>
+        <title>Peace Royal Resort | Home of Peace · Gwarimpa, Abuja</title>
         <meta
           name="description"
-          content="Experience tranquility and luxury at Peace Royal Resort. Discover nature-inspired minimalism in the heart of Gwarimpa."
+          content="Tranquil luxury in Gwarimpa, Abuja. Therapeutic balcony mornings, artisanal dining, and uninterrupted comfort."
         />
       </Helmet>
 
-      <div className="min-h-screen bg-background w-full">
+      <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
         <Header />
         <SidebarNavigation />
 
-        <main className="pb-20 lg:pb-0 w-full">
-          <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
+        <main className="pb-16 md:pb-0 w-full overflow-hidden">
+          {/* Hero Section */}
+          <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0">
               <img
                 src={HOTEL_IMAGES.homeHero}
                 alt="Peace Royal Resort exterior"
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover object-center scale-105"
                 fetchPriority="high"
               />
-              <div className="absolute inset-0 bg-black/30"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/65 to-primary/20 w-full"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-black/55 to-black/35" />
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto w-full px-5 sm:px-6 lg:px-8 pt-28 pb-14 sm:pt-32 sm:pb-20 md:py-24">
+            <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 py-24 sm:py-32 text-center flex flex-col items-center">
               <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                className="w-full max-w-2xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-xs font-medium tracking-wider uppercase mb-6"
               >
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-sm mb-6">
-                  <Sparkles className="w-4 h-4 text-secondary" />
-                  <span>Nature-inspired luxury</span>
-                </div>
-                <h1 className="heading-font text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-6 text-balance leading-[1.1]" style={{ letterSpacing: '-0.02em' }}>
-                  Home of Peace<br />Baile na Siochana
-                </h1>
-                <p className="text-lg sm:text-xl md:text-2xl text-white/80 mb-8 sm:mb-10 leading-relaxed font-light text-balance">
-                  Where mornings taste like peace and nights feel like home.
-                </p>
-                <p className="text-sm md:text-base text-white/85 mb-8 sm:mb-10">
-                  {HOTEL_CONTACT.address}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
-                  <Button asChild size="lg" className="w-full sm:w-auto justify-center bg-secondary hover:bg-secondary/90 text-secondary-foreground text-base px-8 py-6 rounded-xl transition-all duration-300 active:scale-[0.98] shadow-lg shadow-secondary/20">
-                    <Link to="/rooms">Reserve a room</Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline" className="w-full sm:w-auto justify-center bg-white/5 backdrop-blur-md border-white/40 text-white hover:bg-white/10 text-base px-8 py-6 rounded-xl transition-all duration-300 active:scale-[0.98]">
-                    <Link to="/garden">Explore garden</Link>
-                  </Button>
-                </div>
+                <Sparkles className="w-3.5 h-3.5 text-[#E6CF9E]" />
+                <span>Baile na Síochána &middot; Gwarimpa Sanctuary</span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.1 }}
+                className="font-serif text-4xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight leading-[1.08] text-balance max-w-4xl"
+              >
+                Home of Peace
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+                className="mt-6 text-lg sm:text-xl md:text-2xl text-white/85 font-light leading-relaxed max-w-2xl text-balance"
+              >
+                Where mornings taste like peace and nights feel like home.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.25 }}
+                className="mt-2 text-xs sm:text-sm text-white/70 font-mono tracking-wide"
+              >
+                {HOTEL_CONTACT.address}
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.3 }}
+                className="mt-10 flex flex-col sm:flex-row items-center gap-3.5 w-full sm:w-auto"
+              >
+                <Link
+                  to="/rooms"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold bg-white text-[#142B1F] hover:bg-[#F3F1EC] transition-all shadow-lg active:scale-[0.98]"
+                >
+                  <span>Reserve a Room</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/garden"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-medium bg-black/30 backdrop-blur-md border border-white/25 text-white hover:bg-black/45 transition-all active:scale-[0.98]"
+                >
+                  <span>Explore Garden</span>
+                  <Compass className="w-4 h-4 opacity-80" />
+                </Link>
               </motion.div>
             </div>
           </section>
 
-          <section className="py-24 relative overflow-hidden bg-background">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-100px' }}
-                  transition={{ duration: 0.6 }}
-                  className="relative order-2 lg:order-1"
-                >
-                  <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl relative z-10">
-                    <img
-                      src={HOTEL_IMAGES.balconyPhoto}
-                      alt="Peace Royal Resort balcony"
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="absolute -inset-4 bg-muted rounded-3xl -z-10 transform translate-x-4 translate-y-6"></div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: '-100px' }}
-                  transition={{ duration: 0.6 }}
-                  className="order-1 lg:order-2"
-                >
-                  <Sunrise className="w-12 h-12 text-secondary mb-6" />
-                  <h2 className="heading-font text-4xl md:text-5xl font-bold text-foreground mb-6 text-balance">
-                    Therapeutic Mornings on the Balcony
-                  </h2>
-                  <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                    Start your day with fresh tea, a newspaper, and the gentle Gwarimpa sunrise. Breathe in the crisp air and set your intentions. Pure peace.
-                  </p>
-                  <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-xl transition-all duration-300">
-                    <Link to="/balcony-booking">Experience the Balcony</Link>
-                  </Button>
-                </motion.div>
+          {/* Core Privileges / Minimalist Strip */}
+          <section className="py-20 bg-background border-b border-border/50">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="text-center max-w-xl mx-auto mb-14">
+                <span className="text-xs uppercase tracking-widest font-semibold text-primary">Uncompromising Comfort</span>
+                <h2 className="font-serif text-3xl sm:text-4xl font-semibold mt-2 text-foreground">
+                  Quiet Luxury in Every Detail
+                </h2>
               </div>
-            </div>
-          </section>
 
-          <section className="py-16 bg-muted/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {[
-                  { icon: Tv, title: 'Smart TVs', desc: 'Football & Netflix ready' },
-                  { icon: Zap, title: 'Solar Inverter', desc: '24/7 uninterrupted power' },
-                  { icon: BedDouble, title: 'Orthopedic Beds', desc: 'Deep, restorative sleep' },
-                  { icon: Plane, title: 'Airport Pickup', desc: 'Seamless arrivals' },
-                ].map((feature, idx) => {
-                  const Icon = feature.icon;
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {amenities.map((item, idx) => {
+                  const Icon = item.icon;
                   return (
                     <motion.div
                       key={idx}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 15 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: idx * 0.1 }}
-                      className="glassmorphic-card rounded-2xl p-6 text-center hover:-translate-y-1 transition-transform duration-300"
+                      transition={{ duration: 0.4, delay: idx * 0.08 }}
+                      className="p-6 rounded-2xl bg-card border border-border/60 hover:border-border transition-all duration-300"
                     >
-                      <div className="w-14 h-14 mx-auto rounded-full bg-card flex items-center justify-center mb-4 neon-green shadow-sm">
-                        <Icon className="w-6 h-6 text-primary" />
+                      <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                        <Icon className="w-5 h-5 stroke-[2]" />
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                      <p className="text-sm text-muted-foreground">{feature.desc}</p>
+                      <h3 className="text-base font-semibold text-foreground mb-1.5">{item.title}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
                     </motion.div>
                   );
                 })}
@@ -143,57 +163,128 @@ const HomePage = () => {
             </div>
           </section>
 
-          <section className="py-24">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-16">
-                <h2 className="heading-font text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
-                  Curated Spaces
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Intentional design for every mood and moment.
-                </p>
+          {/* Balcony Morning Highlight */}
+          <section className="py-24 bg-card/40 border-b border-border/50">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                  className="lg:col-span-7 relative"
+                >
+                  <div className="relative aspect-[16/10] rounded-3xl overflow-hidden border border-border/80 shadow-md">
+                    <img
+                      src={HOTEL_IMAGES.balconyPhoto}
+                      alt="Peace Royal Resort balcony experience"
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.15 }}
+                  className="lg:col-span-5 space-y-6"
+                >
+                  <span className="text-xs uppercase tracking-widest font-semibold text-primary">Signature Experience</span>
+                  <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-foreground leading-tight">
+                    Therapeutic Mornings on the Private Balcony
+                  </h2>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    Start your day in Gwarimpa with single-origin pour-over tea, a fresh morning press, and the gentle dawn breeze. Slow down, breathe deeply, and reconnect with clarity.
+                  </p>
+                  <div>
+                    <Link
+                      to="/balcony-booking"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
+                    >
+                      <span>Reserve Balcony Morning</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </section>
+
+          {/* Curated Spaces Grid */}
+          <section className="py-24 bg-background">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-4">
+                <div>
+                  <span className="text-xs uppercase tracking-widest font-semibold text-primary">Curated Spaces</span>
+                  <h2 className="font-serif text-3xl sm:text-4xl font-semibold mt-2 text-foreground">
+                    Intentional Design for Rest & Delight
+                  </h2>
+                </div>
+                <Link to="/rooms" className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1">
+                  <span>View all accommodations</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {[
-                  { title: 'Sanctuary Rooms', desc: 'Minimalist decor, maximum comfort.', link: '/rooms', bg: 'bg-muted' },
-                  { title: 'African Dining', desc: 'Authentic flavors, crafted with love.', link: '/restaurant', bg: 'bg-secondary text-secondary-foreground' },
-                  { title: 'Wellness & Flow', desc: 'Yoga, meditation, and inner peace.', link: '/wellness', bg: 'bg-accent text-accent-foreground' },
-                ].map((card, idx) => (
+                {spaces.map((space, idx) => (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: idx * 0.15 }}
-                    className={`${card.bg} rounded-3xl p-8 flex flex-col h-[320px] shadow-sm hover:shadow-xl transition-shadow duration-300 relative overflow-hidden group`}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                    className="group rounded-3xl overflow-hidden bg-card border border-border/70 flex flex-col transition-all hover:shadow-lg hover:border-border"
                   >
-                    <h3 className="heading-font text-3xl font-bold mb-4 relative z-10">{card.title}</h3>
-                    <p className="text-lg opacity-90 relative z-10">{card.desc}</p>
-                    <div className="mt-auto relative z-10">
-                      <Button asChild variant="outline" className="rounded-full bg-white/10 border-white/20 hover:bg-white/20 backdrop-blur-sm transition-all text-current border-current">
-                        <Link to={card.link}>Explore</Link>
-                      </Button>
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                      <img
+                        src={space.image}
+                        alt={space.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[11px] font-medium text-white/95">
+                        {space.badge}
+                      </div>
                     </div>
-                    <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <h3 className="font-serif text-xl font-semibold text-foreground mb-2">{space.title}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed flex-1 mb-6">{space.desc}</p>
+                      <Link
+                        to={space.link}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary group-hover:underline"
+                      >
+                        <span>Explore Space</span>
+                        <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      </Link>
+                    </div>
                   </motion.div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-              <Briefcase className="w-12 h-12 mx-auto mb-6 text-accent" />
-              <h2 className="heading-font text-3xl md:text-4xl font-bold mb-6 text-balance">
+          {/* Commuter Breakfast Banner */}
+          <section className="py-20 bg-[#122419] text-[#F3F1EC] relative overflow-hidden">
+            <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 text-center relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-white/10 mx-auto mb-6 flex items-center justify-center text-[#E6CF9E]">
+                <Briefcase className="w-5 h-5" />
+              </div>
+              <h2 className="font-serif text-3xl sm:text-4xl font-semibold mb-4 text-[#F3F1EC]">
                 Always on the move?
               </h2>
-              <p className="text-lg md:text-xl opacity-90 mb-8 leading-relaxed max-w-2xl mx-auto">
-                Ask about our <strong className="font-semibold text-white">Commuter Breakfast Bag</strong>. Freshly packed pastries, fruit, and coffee ready when you are, so you never have to skip the most important meal of the day.
+              <p className="text-sm sm:text-base text-[#D5DCD2]/85 mb-8 leading-relaxed max-w-xl mx-auto">
+                Request our signature <strong className="text-white font-medium">Commuter Breakfast Bag</strong>. Freshly packed artisan warm pastries, fruit cup, and single-origin roast coffee ready whenever you head out.
               </p>
-              <Button asChild variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 rounded-xl px-8">
-                <Link to="/cafe">View Cafe Options</Link>
-              </Button>
+              <Link
+                to="/cafe"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-semibold bg-white text-[#122419] hover:bg-[#F3F1EC] transition-all shadow-sm"
+              >
+                <span>View Cafe Menu</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </section>
         </main>

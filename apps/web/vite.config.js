@@ -14,19 +14,13 @@ export default defineConfig({
   },
   build: {
     emptyOutDir: true,
+    target: 'es2020',
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) {
             return;
-          }
-
-          if (id.includes('react-router-dom') || id.includes('react-dom') || id.includes('react')) {
-            return 'react-vendor';
-          }
-
-          if (id.includes('framer-motion')) {
-            return 'motion';
           }
 
           if (id.includes('@radix-ui')) {
@@ -37,16 +31,21 @@ export default defineConfig({
             return 'icons';
           }
 
-          if (id.includes('date-fns') || id.includes('react-day-picker')) {
-            return 'date';
+          if (id.includes('framer-motion')) {
+            return 'motion';
           }
 
-          if (id.includes('recharts')) {
-            return 'charts';
-          }
-
-          if (id.includes('pocketbase')) {
-            return 'pocketbase';
+          if (
+            id.includes('/react/') ||
+            id.includes('/react-dom/') ||
+            id.includes('/react-router') ||
+            id.includes('/scheduler/') ||
+            id.includes('\\react\\') ||
+            id.includes('\\react-dom\\') ||
+            id.includes('\\react-router') ||
+            id.includes('\\scheduler\\')
+          ) {
+            return 'react-vendor';
           }
         },
       },

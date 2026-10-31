@@ -275,7 +275,7 @@ const WellnessPage = () => {
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.description}</p>
                         <div className="mt-5 flex items-end justify-between gap-3">
                           <div>
-                            <span className="text-2xl font-bold text-foreground">N{item.price.toLocaleString()}</span>
+                            <span className="text-2xl font-bold text-foreground">₦{item.price.toLocaleString()}</span>
                             <p className="mt-1 text-xs text-muted-foreground">{item.priceNote || 'Priced per booking package.'}</p>
                           </div>
                           <span className="text-sm font-medium text-primary">{item.cta}</span>
@@ -307,7 +307,7 @@ const WellnessPage = () => {
                           <div className="flex items-center justify-between gap-4">
                             <div>
                               <p className="text-sm uppercase tracking-[0.24em] text-white/65">Package price</p>
-                              <p className="mt-2 text-4xl font-bold">N{selectedPackage.price.toLocaleString()}</p>
+                              <p className="mt-2 text-4xl font-bold">₦{selectedPackage.price.toLocaleString()}</p>
                             </div>
                             <div className="rounded-2xl bg-white/10 p-3">
                               {selectedPackage.id === 'Working Class Package' ? <Wifi className="h-7 w-7" /> : <Waves className="h-7 w-7" />}
@@ -316,7 +316,7 @@ const WellnessPage = () => {
                           <p className="mt-4 text-sm leading-6 text-white/78">
                             {selectedPackage.priceNote || 'This package total is based on the guest count selected below.'}
                           </p>
-                          <p className="mt-3 text-sm leading-6 text-white/92">Your total today: N{totalPrice.toLocaleString()}</p>
+                          <p className="mt-3 text-sm leading-6 text-white/92">Your total today: ₦{totalPrice.toLocaleString()}</p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">

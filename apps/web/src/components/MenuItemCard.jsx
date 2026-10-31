@@ -14,7 +14,7 @@ const MenuItemCard = ({
   item,
   quantity = 0,
   onConfirm,
-  currency = 'N',
+  currency = '₦',
   imageHeightClass = 'h-44',
   accentClassName = 'bg-primary hover:bg-primary/90 text-primary-foreground',
   badgeText,

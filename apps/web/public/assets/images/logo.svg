@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E2C78E" />
+      <stop offset="50%" stop-color="#C9A66B" />
+      <stop offset="100%" stop-color="#A58245" />
+    </linearGradient>
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#234633" />
+      <stop offset="100%" stop-color="#142B1F" />
+    </linearGradient>
+  </defs>
+
+  <!-- Base Crest Circle -->
+  <circle cx="60" cy="60" r="56" fill="url(#emeraldGrad)" stroke="url(#goldGrad)" stroke-width="1.5" />
+  <circle cx="60" cy="60" r="51" fill="none" stroke="url(#goldGrad)" stroke-width="0.75" stroke-dasharray="2 3" opacity="0.6" />
+
+  <!-- Botanical Olive Branch / Laurel Motif (Peace) -->
+  <g fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.75">
+    <!-- Left Branch -->
+    <path d="M 32 68 C 30 50, 36 34, 60 25" />
+    <path d="M 32 58 Q 28 54 33 50" />
+    <path d="M 36 48 Q 32 44 38 41" />
+    <path d="M 43 38 Q 40 33 47 32" />
+    <!-- Right Branch -->
+    <path d="M 88 68 C 90 50, 84 34, 60 25" />
+    <path d="M 88 58 Q 92 54 87 50" />
+    <path d="M 84 48 Q 88 44 82 41" />
+    <path d="M 77 38 Q 80 33 73 32" />
+  </g>
+
+  <!-- Crown / Diadem Motif (Royal) -->
+  <path d="M 52 32 L 60 27 L 68 32 L 65 35 L 55 35 Z" fill="url(#goldGrad)" opacity="0.9" />
+  <circle cx="52" cy="30" r="1.2" fill="#FFFFFF" />
+  <circle cx="60" cy="25" r="1.5" fill="#FFFFFF" />
+  <circle cx="68" cy="30" r="1.2" fill="#FFFFFF" />
+
+  <!-- Serif PR Monogram -->
+  <g fill="url(#goldGrad)">
+    <!-- Letter P -->
+    <path d="M 44 44 H 56 C 62 44, 65 47, 65 52 C 65 57, 62 60, 56 60 H 48.5 V 74 H 44 V 44 Z M 48.5 48 V 56.5 H 55.5 C 58.5 56.5, 60.5 54.8, 60.5 52 C 60.5 49.2, 58.5 48, 55.5 48 Z" />
+    <!-- Letter R -->
+    <path d="M 64 54 H 74 C 79 54, 82 56.5, 82 60 C 82 63.5, 79 66, 74 66 H 68 V 74 H 64 V 54 Z M 68 57.5 V 62.5 H 73.5 C 75.8 62.5, 77.5 61.5, 77.5 60 C 77.5 58.5, 75.8 57.5, 73.5 57.5 Z M 72 65 L 81 74 H 75.5 L 67.5 66 Z" />
+  </g>
+
+  <!-- Subtle Star of Peace -->
+  <polygon points="60,82 61.2,85 64.5,85 61.8,87 62.8,90 60,88 57.2,90 58.2,87 55.5,85 58.8,85" fill="url(#goldGrad)" opacity="0.8" />
+</svg>

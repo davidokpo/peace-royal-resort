@@ -122,8 +122,7 @@ const GardenBookingPage = () => {
     media: [
       { src: HOTEL_IMAGES.gardenDay, alt: 'Garden daytime photo' },
       { src: HOTEL_IMAGES.gardenBookingDay, alt: 'Garden day booking view' },
-      { src: '/assets/images/IMG_7555.MOV', alt: 'Garden daytime atmosphere video', startAt: 10, endAt: 20 },
-      { src: '/assets/images/garden-games.mp4', alt: 'Garden games and hangout moment', startAt: 10, endAt: 20 },
+            { src: '/assets/images/garden-games.mp4', alt: 'Garden games and hangout moment', startAt: 10, endAt: 20 },
       { src: '/assets/images/garden-events.mp4', alt: 'Garden event in daylight', startAt: 10, endAt: 20 },
     ],
     text: 'text-foreground'

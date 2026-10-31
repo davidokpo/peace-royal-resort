@@ -205,7 +205,7 @@ const RestaurantPage = () => {
                     <h3 className="font-bold text-lg mb-3">{pkg.name}</h3>
                     <p className="text-sm text-muted-foreground mb-6 h-10">{pkg.desc}</p>
                     <div className="flex flex-col items-center justify-between mt-auto gap-4">
-                      <span className="font-bold text-xl">N{pkg.price.toLocaleString()}</span>
+                      <span className="font-bold text-xl">₦{pkg.price.toLocaleString()}</span>
                       <div className="flex items-center gap-3 bg-secondary/10 rounded-full px-4 py-2 w-full justify-center">
                         <button type="button" onClick={() => updateCart(pkg, -1)} className="p-1 hover:bg-secondary/20 rounded-full">
                           <Minus className="w-4 h-4" />
@@ -291,7 +291,7 @@ const RestaurantPage = () => {
                 <div className="border-t border-border pt-6">
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-lg font-medium text-foreground">Total Order Value:</span>
-                    <span className="text-2xl font-bold text-secondary">N{calculateTotal().toLocaleString()}</span>
+                    <span className="text-2xl font-bold text-secondary">₦{calculateTotal().toLocaleString()}</span>
                   </div>
                   <TurnstileField
                     onVerify={setCaptchaToken}

@@ -45,7 +45,7 @@ const RoomsPage = () => {
       media: [
         { src: HOTEL_IMAGES.roomExecutive, alt: 'Executive suite photo' },
         {
-          src: '/assets/images/executive_room.MOV',
+          src: '/assets/images/executive_room.mp4',
           alt: 'Executive suite video tour',
           startAt: 12,
           endAt: 24,
@@ -206,7 +206,7 @@ const RoomsPage = () => {
                   <div className="md:w-1/2 h-64 md:h-auto relative">
                     <MediaSlideshow items={room.media} className="h-full w-full" />
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-primary shadow-sm">
-                      N{room.price.toLocaleString()} / night
+                      ₦{room.price.toLocaleString()} / night
                     </div>
                   </div>
                   <div className="md:w-1/2 p-8 flex flex-col justify-center">
@@ -215,7 +215,7 @@ const RoomsPage = () => {
                     <div className="grid grid-cols-2 gap-4 mb-8">
                       {room.amenities.map((am, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-foreground/80">
-                          <div className="w-2 h-2 rounded-full bg-accent neon-green"></div>
+                          <div className="w-2 h-2 rounded-full bg-primary/80"></div>
                           {am}
                         </div>
                       ))}
@@ -276,7 +276,7 @@ const RoomsPage = () => {
                       <SelectContent>
                         {rooms.map((r) => (
                           <SelectItem key={r.id} value={r.name}>
-                            {r.name} (N{r.price.toLocaleString()})
+                            {r.name} (₦{r.price.toLocaleString()})
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -307,11 +307,11 @@ const RoomsPage = () => {
                   <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-muted-foreground">{calculateNights()} nights x {formData.room_type}</span>
-                      <span className="font-bold text-foreground">N{calculateSubtotal().toLocaleString()}</span>
+                      <span className="font-bold text-foreground">₦{calculateSubtotal().toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center mb-2 text-sm">
                       <span className="text-muted-foreground">VAT (7.5%)</span>
-                      <span className="font-semibold text-foreground">N{calculateTax().toLocaleString()}</span>
+                      <span className="font-semibold text-foreground">₦{calculateTax().toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center mb-2 text-sm">
                       <span className="text-muted-foreground">Complimentary breakfast</span>
@@ -319,7 +319,7 @@ const RoomsPage = () => {
                     </div>
                     <div className="flex justify-between items-center pt-2 mb-2 border-t border-primary/10">
                       <span className="font-semibold text-foreground">Estimated total</span>
-                      <span className="font-bold text-foreground">N{calculateTotal().toLocaleString()}</span>
+                      <span className="font-bold text-foreground">₦{calculateTotal().toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm text-muted-foreground">
                       <span className="flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> Booking request stored securely</span>

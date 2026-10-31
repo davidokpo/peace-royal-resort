@@ -1,5 +1,5 @@
 export const HOTEL_CONTACT = {
-  phoneDisplay: '+2349061967954',
+  phoneDisplay: '+234 906 196 7954',
   phoneHref: 'tel:+2349061967954',
   email: 'info@peaceroyalresort.com',
   address: 'Opposite Candle Stick School, Gwarimpa, Abuja',
@@ -13,8 +13,9 @@ export const HOTEL_SOCIALS = {
 };
 
 export const HOTEL_IMAGES = {
+  logo: '/assets/images/logo.png',
   homeHero: '/assets/images/home-hero.jpg',
-  homeBalcony: '/assets/images/home-balcony.MOV',
+  homeBalcony: '/assets/images/Balcony.jpg',
   balconyPhoto: '/assets/images/Balcony.jpg',
   socialHero: '/assets/images/social-hero.jpg',
   gardenDay: '/assets/images/garden-day.jpg',
@@ -23,7 +24,7 @@ export const HOTEL_IMAGES = {
   gardenBookingNight: '/assets/images/garden-booking-night.svg',
   roomExecutive: '/assets/images/room-executive.jpg',
   roomDeluxe: '/assets/images/room-deluxe.jpg',
-  restaurantMain: '/assets/images/restaurant-main.svg',
+  restaurantMain: '/assets/images/Pepper Soup (GoatFish).jpg',
   cafeWorkspace: '/assets/images/cafe-workspace.mp4',
   cafeGames: '/assets/images/cafe-games.mp4',
   wellnessHero: '/assets/images/wellness-hero.svg',
