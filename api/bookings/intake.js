@@ -2,6 +2,7 @@ import { google } from 'googleapis';
 import { applySecurityHeaders, enforceRateLimit } from '../_lib/security.js';
 import { verifyTurnstileToken } from '../_lib/turnstile.js';
 import { validateBookingPayload } from '../_lib/validation.js';
+import { notifyBookingChannels } from '../_lib/notifications.js';
 
 const ORDER_TYPES = new Set(['restaurant', 'cafe']);
 
@@ -655,29 +656,38 @@ export default async function handler(req, res) {
     }
 
     const booking = buildStoredBooking(bookingData, type);
-    const sheets = await getSheetsClient();
-    const spreadsheetId = getSpreadsheetIdForType(booking);
+    const config = getBookingTypeConfig(booking);
 
-    if (!sheets || !spreadsheetId) {
-      return res.status(500).json({
-        error: 'Google Sheets is not configured on the server',
-      });
+    // 1. Record to Google Sheets (if configured)
+    let sheetRecorded = false;
+    try {
+      const sheets = await getSheetsClient();
+      const spreadsheetId = getSpreadsheetIdForType(booking);
+
+      if (sheets && spreadsheetId) {
+        await ensureSheetHeader(sheets, spreadsheetId, config);
+        await sheets.spreadsheets.values.append({
+          spreadsheetId,
+          range: `${config.sheetName}!A:${toColumnLetter(config.headers.length)}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: {
+            values: [config.rowBuilder(booking).map(sanitizeSpreadsheetCell)],
+          },
+        });
+        sheetRecorded = true;
+      } else {
+        console.warn('Google Sheets is not configured (missing credentials or spreadsheet ID)');
+      }
+    } catch (sheetErr) {
+      console.error('Google Sheets append error:', sheetErr.message);
     }
 
-    const config = getBookingTypeConfig(booking);
-    await ensureSheetHeader(sheets, spreadsheetId, config);
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: `${config.sheetName}!A:${toColumnLetter(config.headers.length)}`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [config.rowBuilder(booking).map(sanitizeSpreadsheetCell)],
-      },
-    });
+    // 2. Dispatch instant notifications (Telegram & Email)
+    await notifyBookingChannels(booking, type);
 
     return res.status(201).json({
       success: true,
-      message: 'Booking stored in Google Sheets',
+      message: sheetRecorded ? 'Booking stored in Google Sheets and notifications sent' : 'Booking received and notifications sent',
       booking: {
         ...booking,
         status: booking[config.statusKey] || 'pending',
