@@ -69,9 +69,9 @@ const HomePage = () => {
 
             <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 py-24 sm:py-32 text-center flex flex-col items-center">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.35 }}
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-xs font-medium tracking-wider uppercase mb-6"
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#E6CF9E]" />
@@ -79,36 +79,36 @@ const HomePage = () => {
               </motion.div>
 
               <motion.h1
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.1 }}
+                transition={{ duration: 0.35, delay: 0.05 }}
                 className="font-serif text-4xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight leading-[1.08] text-balance max-w-4xl"
               >
                 Home of Peace
               </motion.h1>
 
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.2 }}
+                transition={{ duration: 0.35, delay: 0.1 }}
                 className="mt-6 text-lg sm:text-xl md:text-2xl text-white/85 font-light leading-relaxed max-w-2xl text-balance"
               >
                 Where mornings taste like peace and nights feel like home.
               </motion.p>
 
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.25 }}
+                transition={{ duration: 0.35, delay: 0.15 }}
                 className="mt-2 text-xs sm:text-sm text-white/70 font-mono tracking-wide"
               >
                 {HOTEL_CONTACT.address}
               </motion.p>
 
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.3 }}
+                transition={{ duration: 0.35, delay: 0.2 }}
                 className="mt-10 flex flex-col sm:flex-row items-center gap-3.5 w-full sm:w-auto"
               >
                 <Link
@@ -145,10 +145,10 @@ const HomePage = () => {
                   return (
                     <motion.div
                       key={idx}
-                      initial={{ opacity: 0, y: 15 }}
+                      initial={{ opacity: 0, y: 12 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: idx * 0.08 }}
+                      viewport={{ once: true, margin: '150px' }}
+                      transition={{ duration: 0.3, delay: idx * 0.05 }}
                       className="p-6 rounded-2xl bg-card border border-border/60 hover:border-border transition-all duration-300"
                     >
                       <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">

@@ -46,7 +46,11 @@ const MenuItemCard = ({
             src={item.img}
             alt={item.name}
             loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.src = '/assets/images/cafe-herbal-tea.jpg';
+            }}
           />
           {item.night ? (
             <div className="absolute right-3 top-3 rounded-full bg-background/85 p-2 shadow-sm">
@@ -83,7 +87,15 @@ const MenuItemCard = ({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md overflow-hidden p-0">
           <div className="h-56 w-full overflow-hidden">
-            <img src={item.img} alt={item.name} className="h-full w-full object-cover" />
+            <img
+              src={item.img}
+              alt={item.name}
+              className="h-full w-full object-cover"
+              decoding="async"
+              onError={(e) => {
+                e.currentTarget.src = '/assets/images/cafe-herbal-tea.jpg';
+              }}
+            />
           </div>
           <div className="p-6">
             <DialogHeader className="space-y-1 text-left">

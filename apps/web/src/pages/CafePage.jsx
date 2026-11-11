@@ -67,9 +67,9 @@ const CafePage = () => {
   ];
 
   const workspaceMedia = [
-    { src: '/assets/images/cafe-workspace.svg', alt: 'Cafe workspace preview' },
-    { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe workspace video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-workspace.svg' },
-        { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe games video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-games.svg' },
+    { src: '/assets/images/cafe-herbal-tea.jpg', alt: 'Cafe workspace and tea table' },
+    { src: '/assets/images/cafe-workspace.mp4', alt: 'Cafe workspace video', poster: '/assets/images/cafe-herbal-tea.jpg' },
+    { src: '/assets/images/cafe-espresso.jpg', alt: 'Artisan espresso roast' },
   ];
 
   const featuredCafeItems = cafeItems.slice(0, 8);
@@ -78,9 +78,9 @@ const CafePage = () => {
   const hasClubSandwichInCart = Boolean(cart[CLUB_SANDWICH_ITEM_ID]);
 
   const gameNightMedia = [
-    { src: '/assets/images/cafe-games.svg', alt: 'Cafe game night preview' },
-    { src: HOTEL_IMAGES.cafeGames, alt: 'Cafe game night video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-games.svg' },
-        { src: HOTEL_IMAGES.cafeWorkspace, alt: 'Cafe social workspace event video', startAt: 10, endAt: 20, poster: '/assets/images/cafe-workspace.svg' },
+    { src: '/assets/images/cafe-games.mp4', alt: 'Cafe games and social vibes', poster: '/assets/images/cafe-small-chops.jpg' },
+    { src: '/assets/images/cafe-club-sandwich.jpg', alt: 'Cafe evening snacks' },
+    { src: '/assets/images/cafe-smoothie.jpg', alt: 'Chilled fruit smoothies' },
   ];
 
   const updateCart = (item, delta) => {
@@ -235,7 +235,7 @@ const CafePage = () => {
           <section className="bg-background text-foreground pt-32 pb-24 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
                   <Laptop className="w-12 h-12 text-primary mb-6" />
                   <h1 className="heading-font text-5xl md:text-6xl font-bold mb-4">Your Workspace.<br/>Your Vibe.</h1>
                   <p className="text-lg text-muted-foreground max-w-lg leading-relaxed mb-8">
@@ -255,9 +255,9 @@ const CafePage = () => {
                   </div>
                 </motion.div>
                 
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} className="space-y-5">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }} className="space-y-5">
                   <div className="h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-border/60">
-                    <MediaSlideshow items={workspaceMedia} className="h-full w-full" activateWhenInView />
+                    <MediaSlideshow items={workspaceMedia} className="h-full w-full" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {secondaryCafeItems.map(item => (

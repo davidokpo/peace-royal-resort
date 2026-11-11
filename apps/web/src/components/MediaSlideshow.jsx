@@ -119,16 +119,16 @@ const MediaSlideshow = ({
 
   return (
     <div ref={containerRef} className={`relative overflow-hidden ${className}`}>
-      {isInView && mediaType === 'video' ? (
+      {mediaType === 'video' ? (
         <video
           key={activeSlide.src}
-          src={getVideoSrc(activeSlide)}
+          src={isInView ? getVideoSrc(activeSlide) : undefined}
           className="h-full w-full object-cover"
-          autoPlay
+          autoPlay={isInView}
           muted
           loop
           playsInline
-          preload="metadata"
+          preload={isInView ? 'auto' : 'none'}
           poster={activeSlide.poster}
           onError={(e) => {
             if (activeSlide.poster) {
