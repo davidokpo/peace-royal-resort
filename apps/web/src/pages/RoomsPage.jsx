@@ -44,13 +44,6 @@ const RoomsPage = () => {
       image: HOTEL_IMAGES.roomExecutive,
       media: [
         { src: HOTEL_IMAGES.roomExecutive, alt: 'Executive suite photo' },
-        {
-          src: '/assets/images/executive_room.mp4',
-          alt: 'Executive suite video tour',
-          startAt: 12,
-          endAt: 24,
-          poster: HOTEL_IMAGES.roomExecutive,
-        },
       ],
       desc: 'Spacious luxury with premium amenities, perfect for extended stays.',
       amenities: ['Orthopedic bed', 'Smart TV (Netflix)', 'Elegant room finish', 'High-speed WiFi', 'Laundry service', 'Complimentary breakfast'],

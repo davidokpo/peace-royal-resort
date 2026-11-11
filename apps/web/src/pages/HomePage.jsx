@@ -36,7 +36,7 @@ const HomePage = () => {
       desc: 'Freshly brewed single-origin roasts, matcha, and board games.',
       link: '/cafe',
       badge: 'Open Daily',
-      image: HOTEL_IMAGES.cafeWorkspace
+      image: HOTEL_IMAGES.cafePhoto
     },
   ];
 
@@ -75,7 +75,7 @@ const HomePage = () => {
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-xs font-medium tracking-wider uppercase mb-6"
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#E6CF9E]" />
-                <span>Baile na Síochána &middot; Gwarimpa Sanctuary</span>
+                <span>Home of Peace &middot; Gwarimpa Sanctuary</span>
               </motion.div>
 
               <motion.h1

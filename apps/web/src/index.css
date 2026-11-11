@@ -26,14 +26,14 @@
     --popover: 0 0% 100%;
     --popover-foreground: 150 22% 11%;
 
-    --border: 38 16% 88%;
-    --input: 38 16% 85%;
+    --border: 38 18% 91%;
+    --input: 38 18% 88%;
     --ring: 152 32% 18%;
 
     --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 98%;
 
-    --radius: 0.875rem;
+    --radius: 1rem;
   }
 
   .dark {
@@ -84,25 +84,25 @@ body {
 
 @layer components {
   .glassmorphic-card {
-    background: rgba(255, 255, 255, 0.78);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border: 1px solid rgba(22, 33, 26, 0.07);
-    box-shadow: 0 2px 16px -2px rgba(22, 33, 26, 0.04);
+    border: 1px solid rgba(22, 33, 26, 0.05);
+    box-shadow: 0 4px 20px -2px rgba(22, 33, 26, 0.03);
   }
 
   .glassmorphic-panel {
-    background: rgba(255, 255, 255, 0.86);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border: 1px solid rgba(22, 33, 26, 0.08);
-    box-shadow: 0 8px 32px -8px rgba(22, 33, 26, 0.06);
+    border: 1px solid rgba(22, 33, 26, 0.06);
+    box-shadow: 0 12px 36px -8px rgba(22, 33, 26, 0.05);
   }
 
   .glass-panel-light {
     background: #FFFFFF;
-    border: 1px solid rgba(22, 33, 26, 0.08);
-    box-shadow: 0 8px 30px -6px rgba(22, 33, 26, 0.05);
+    border: 1px solid rgba(22, 33, 26, 0.06);
+    box-shadow: 0 10px 32px -6px rgba(22, 33, 26, 0.04);
   }
 
   .heading-font {

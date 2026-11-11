@@ -38,7 +38,7 @@ const Footer = () => {
                   Peace Royal Resort
                 </h3>
                 <p className="text-xs text-[#A3B899] font-medium tracking-wide">
-                  Baile na Síochána
+                  Home of Peace &middot; Gwarimpa, Abuja
                 </p>
               </div>
             </Link>

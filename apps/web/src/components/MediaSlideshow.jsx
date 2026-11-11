@@ -130,6 +130,11 @@ const MediaSlideshow = ({
           playsInline
           preload="metadata"
           poster={activeSlide.poster}
+          onError={(e) => {
+            if (activeSlide.poster) {
+              e.currentTarget.style.display = 'none';
+            }
+          }}
         />
       ) : (
         <img
@@ -140,6 +145,9 @@ const MediaSlideshow = ({
           loading={imageLoading}
           decoding="async"
           fetchPriority={imageFetchPriority}
+          onError={(e) => {
+            e.currentTarget.src = '/assets/images/home-hero.jpg';
+          }}
         />
       )}
 

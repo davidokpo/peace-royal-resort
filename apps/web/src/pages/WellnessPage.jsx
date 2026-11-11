@@ -2,7 +2,24 @@ import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Flower2, Gamepad2, Crown, Loader2, Sparkles, CheckCircle2, Coffee, Trees, Waves, Wine, Sunrise, BriefcaseBusiness, Wifi } from 'lucide-react';
+import {
+  Flower2,
+  Gamepad2,
+  Crown,
+  Loader2,
+  Sparkles,
+  CheckCircle2,
+  Coffee,
+  Trees,
+  Waves,
+  BriefcaseBusiness,
+  Wifi,
+  Calendar,
+  Clock,
+  Users,
+  ShieldCheck,
+  Check,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +30,7 @@ import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
-import { HOTEL_IMAGES } from '@/config/siteContent.js';
+import { HOTEL_IMAGES, HOTEL_CONTACT } from '@/config/siteContent.js';
 import { submitBookingRequest } from '@/lib/bookingSubmission.js';
 import { startCheckoutOrShowPending } from '@/lib/paymentCheckout.js';
 
@@ -25,13 +42,13 @@ const packages = [
     price: 100000,
     icon: Crown,
     accent: 'from-[#7C5B3B] to-[#3E2414]',
-    cardTone: 'bg-[#F8E7D4]',
+    tagColor: 'bg-amber-100 text-amber-900 border-amber-200',
     description:
       'For the guest who wants comfort to arrive before they do, this package wraps every hour in quiet indulgence. Expect graceful mornings, rich meals, a restful room, evening pampering, and small touches of celebration that make the stay feel generous and memorable.',
     access: [
       'Executive room stay with elevated in-room comfort',
       'Cafe access for focused work or gentle afternoon breaks',
-      'Evening massage session',
+      'Evening massage session for deep release',
       'Full access to the Wellness Package experience',
       'Full access to the Fun and Games Package experience',
       'Curated premium room touches including chilled wine',
@@ -52,7 +69,7 @@ const packages = [
     price: 70000,
     icon: Flower2,
     accent: 'from-[#8FAF7A] to-[#58705B]',
-    cardTone: 'bg-[#F4F1E7]',
+    tagColor: 'bg-emerald-100 text-emerald-900 border-emerald-200',
     description:
       'Slip into a slower rhythm where dawn feels gentle, the air feels kinder, and your body is finally allowed to exhale. This retreat is designed for restoration, with guided stretching, soft music, nourishing bites, and quiet corners that help you feel cared for from sunrise to sleep.',
     access: [
@@ -77,24 +94,24 @@ const packages = [
     price: 10000,
     icon: BriefcaseBusiness,
     accent: 'from-[#3F6C88] to-[#1F3C4D]',
-    cardTone: 'bg-[#E4EEF3]',
+    tagColor: 'bg-sky-100 text-sky-900 border-sky-200',
     description:
       'Built for founders, teams, and professionals who want a calm venue for meetings, seminars, strategy sessions, or client presentations. The package opens the cafe to focused work, steady internet, projector use, and light hospitality across the day.',
     access: [
       'All-day cafe access for focused work and team sessions',
-      'Reliable internet for presentations and meetings',
+      'Reliable high-speed internet for presentations and calls',
       'Business meetings and seminars with projector support',
-      'Breakfast or lunch service depending on how long the session runs',
+      'Breakfast or lunch service depending on schedule',
       'Maximum seating capacity of 20 guests',
     ],
     menu: [
-      'Fresh fruits',
-      'Water service',
-      'Tea service',
-      'Pastries',
+      'Fresh fruit platter',
+      'Bottled water service',
+      'Continuous tea service',
+      'Warm artisanal pastries',
     ],
     cta: 'Book the session',
-    priceNote: 'Priced per guest. Final total depends on invited headcount, up to 20 people.',
+    priceNote: 'Priced per guest. Final total depends on headcount (up to 20 people).',
     maxGuests: 20,
   },
   {
@@ -104,7 +121,7 @@ const packages = [
     price: 30000,
     icon: Gamepad2,
     accent: 'from-[#F2A83B] to-[#8B3F18]',
-    cardTone: 'bg-[#FFF1D8]',
+    tagColor: 'bg-orange-100 text-orange-900 border-orange-200',
     description:
       'This one is for laughter, friendly rivalry, and memories that stay long after checkout. Move from board games to balcony banter to smoky garden grills, with easy drinks, playful energy, and a social rhythm that keeps the whole experience bright and alive.',
     access: [
@@ -114,9 +131,9 @@ const packages = [
       'Social spaces designed for easy fun and shared memories',
     ],
     menu: [
-      'Smoothies or soda on the balcony',
+      'Smoothies or chilled soda on the balcony',
       'Pepper soup in the garden',
-      'Palm wine and grills',
+      'Palm wine and evening grills',
     ],
     cta: 'Choose the vibes',
   },
@@ -135,18 +152,18 @@ const WellnessPage = () => {
     phone: '',
     class_type: packages[0].id,
     booking_date: '',
-    booking_time: '07:00',
+    booking_time: '09:00',
     participants_count: 1,
-    special_requests: ''
+    special_requests: '',
   });
 
   const selectedPackage = useMemo(
     () => packages.find((item) => item.id === selectedPackageId) ?? packages[0],
-    [selectedPackageId],
+    [selectedPackageId]
   );
 
   const guestLimit = selectedPackage.maxGuests || 50;
-  const totalPrice = selectedPackage.price * Number(formData.participants_count || 1);
+  const totalPrice = selectedPackage.price * Math.max(1, Number(formData.participants_count || 1));
 
   const handlePackageSelect = (packageId) => {
     const nextPackage = packages.find((item) => item.id === packageId) ?? packages[0];
@@ -156,6 +173,12 @@ const WellnessPage = () => {
       class_type: packageId,
       participants_count: Math.min(Number(current.participants_count || 1), nextPackage.maxGuests || 50),
     }));
+
+    // Smooth scroll to reservation form
+    const formElement = document.getElementById('booking-form');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -214,7 +237,9 @@ const WellnessPage = () => {
       });
 
       if (!checkout.started) {
-        toast.warning('Your request was saved, but payment could not be started automatically. Please contact the hotel to complete payment.');
+        toast.warning(
+          'Your request was saved, but payment could not be started automatically. Please contact the hotel to complete payment.'
+        );
       }
     } catch (error) {
       console.error(error);
@@ -230,207 +255,353 @@ const WellnessPage = () => {
   return (
     <>
       <Helmet>
-        <title>Packages and Retreats - Peace Royal Resort</title>
+        <title>Packages & Wellness Retreats — Peace Royal Resort</title>
+        <meta
+          name="description"
+          content="Curated stay packages, wellness retreats, working class sessions, and fun gatherings at Peace Royal Resort in Gwarimpa, Abuja."
+        />
       </Helmet>
 
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
         <Header />
         <SidebarNavigation />
 
-        <main>
-          <section className="relative overflow-hidden bg-background pt-32 pb-24">
-            <div className="absolute inset-0 dot-pattern opacity-20"></div>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-              <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-medium text-primary backdrop-blur-sm">
-                  <Sparkles className="h-4 w-4" /> Curated stay packages
+        <main className="flex-1 w-full pb-24">
+          {/* Hero Header — Open, airy, unboxed */}
+          <section className="relative pt-24 pb-16 md:pt-32 md:pb-20 overflow-hidden">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="max-w-3xl">
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs font-medium text-primary shadow-sm backdrop-blur-sm">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>Curated Stay Packages & Retreats</span>
                 </div>
-                <h1 className="heading-font mt-6 text-5xl font-bold leading-tight text-foreground md:text-6xl">
-                  Packages made for calm, comfort, and beautiful memories.
+                <h1 className="heading-font mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.12] text-foreground tracking-tight text-balance">
+                  Tailored moments for calm, comfort, and restoration.
                 </h1>
-                <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-                  Choose the feeling you want to carry home with you. Whether you want restoration, indulgence, playful connection, or a structured workday, each package is designed as a full little world of access, food, and atmosphere.
+                <p className="mt-5 text-base sm:text-lg leading-relaxed text-muted-foreground text-balance">
+                  Choose the feeling you want to carry home with you. Whether you seek slow restoration, executive comfort, playful connection, or a productive team work day, every package is designed with care.
                 </p>
+              </div>
 
-                <div className="mt-10 grid gap-5 md:auto-rows-fr md:grid-cols-2 xl:grid-cols-4">
-                  {packages.map((item) => {
-                    const Icon = item.icon;
-                    const isSelected = selectedPackageId === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => handlePackageSelect(item.id)}
-                        className={`flex h-full flex-col rounded-[2rem] border bg-card p-6 text-left transition-all duration-300 ${
-                          isSelected
-                            ? 'border-primary/30 shadow-[0_18px_60px_rgba(47,58,47,0.18)]'
-                            : 'border-border/70 shadow-[0_12px_40px_rgba(80,70,50,0.08)] hover:shadow-[0_18px_50px_rgba(80,70,50,0.14)]'
-                        }`}
-                      >
-                        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
-                          <Icon className="h-7 w-7" />
+              {/* Package Tier Cards Grid */}
+              <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {packages.map((item) => {
+                  const Icon = item.icon;
+                  const isSelected = selectedPackageId === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => handlePackageSelect(item.id)}
+                      className={`relative flex flex-col text-left p-6 rounded-3xl transition-all duration-300 ${
+                        isSelected
+                          ? 'bg-card border-2 border-primary shadow-xl ring-2 ring-primary/10'
+                          : 'bg-card/70 border border-border/70 hover:border-border hover:bg-card hover:shadow-md'
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-4 right-4 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                          <Check className="h-3.5 w-3.5 stroke-[3]" />
                         </div>
-                        <div className="text-sm font-semibold uppercase tracking-[0.22em] text-muted-foreground">{item.shortLabel}</div>
-                        <h2 className="mt-2 text-2xl font-bold text-foreground">{item.name}</h2>
-                        <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.description}</p>
-                        <div className="mt-5 flex items-end justify-between gap-3">
-                          <div>
-                            <span className="text-2xl font-bold text-foreground">₦{item.price.toLocaleString()}</span>
-                            <p className="mt-1 text-xs text-muted-foreground">{item.priceNote || 'Priced per booking package.'}</p>
-                          </div>
-                          <span className="text-sm font-medium text-primary">{item.cta}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-
-              <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="mt-12">
-                <div className="overflow-hidden rounded-[2.5rem] border border-white/60 bg-white/70 shadow-[0_24px_80px_rgba(63,51,35,0.14)] backdrop-blur-md">
-                  <div className="relative h-[320px] overflow-hidden">
-                    <img src={HOTEL_IMAGES.wellnessHero} alt="Curated hotel lifestyle package" className="h-full w-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent"></div>
-                    <div className="absolute inset-x-0 bottom-0 p-8 text-white">
-                      <div className="inline-flex items-center gap-2 rounded-full bg-white/18 px-3 py-1 text-xs uppercase tracking-[0.25em] backdrop-blur-sm">
-                        <Sunrise className="h-4 w-4" /> Package description
+                      )}
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
+                        <Icon className="h-6 w-6 stroke-[2]" />
                       </div>
-                      <h3 className="heading-font mt-4 text-4xl font-bold">{selectedPackage.name}</h3>
-                      <p className="mt-3 max-w-2xl text-sm leading-6 text-white/90">{selectedPackage.description}</p>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {item.shortLabel}
+                      </span>
+                      <h2 className="heading-font mt-1.5 text-xl font-bold text-foreground">
+                        {item.name}
+                      </h2>
+                      <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+                        {item.description}
+                      </p>
+                      <div className="mt-6 pt-4 border-t border-border/50 flex items-baseline justify-between gap-2">
+                        <div>
+                          <span className="text-xl font-bold text-foreground tabular-nums">
+                            ₦{item.price.toLocaleString()}
+                          </span>
+                          <span className="block text-[10px] text-muted-foreground mt-0.5">
+                            {item.maxGuests ? 'per guest' : 'per package'}
+                          </span>
+                        </div>
+                        <span className={`text-xs font-semibold ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
+                          {isSelected ? 'Selected' : 'Select'}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          {/* Selected Package Details & Interactive Reservation Form */}
+          <section id="booking-form" className="py-12 bg-card/40 border-t border-border/50 scroll-mt-20">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+                {/* Left Column: Selected Package Experience & Inclusions */}
+                <div className="lg:col-span-5 space-y-8">
+                  {/* Package Essence Card */}
+                  <div className="rounded-3xl border border-border/80 bg-card p-7 shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-4">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Selected Package
+                      </span>
+                      <span className="text-2xl font-bold text-primary tabular-nums">
+                        ₦{selectedPackage.price.toLocaleString()}
+                      </span>
                     </div>
+
+                    <h2 className="heading-font text-3xl font-bold text-foreground">
+                      {selectedPackage.name}
+                    </h2>
+                    <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                      {selectedPackage.description}
+                    </p>
+
+                    {selectedPackage.priceNote && (
+                      <p className="mt-3 text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200/60 rounded-xl p-3">
+                        {selectedPackage.priceNote}
+                      </p>
+                    )}
                   </div>
 
-                  <div className="p-8">
-                    <div className="rounded-[2rem] bg-primary p-6 text-primary-foreground shadow-xl">
-                      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)] xl:items-start">
-                        <div className="rounded-[1.75rem] bg-white/8 p-5">
-                          <div className="flex items-center justify-between gap-4">
-                            <div>
-                              <p className="text-sm uppercase tracking-[0.24em] text-white/65">Package price</p>
-                              <p className="mt-2 text-4xl font-bold">₦{selectedPackage.price.toLocaleString()}</p>
-                            </div>
-                            <div className="rounded-2xl bg-white/10 p-3">
-                              {selectedPackage.id === 'Working Class Package' ? <Wifi className="h-7 w-7" /> : <Waves className="h-7 w-7" />}
-                            </div>
-                          </div>
-                          <p className="mt-4 text-sm leading-6 text-white/78">
-                            {selectedPackage.priceNote || 'This package total is based on the guest count selected below.'}
-                          </p>
-                          <p className="mt-3 text-sm leading-6 text-white/92">Your total today: ₦{totalPrice.toLocaleString()}</p>
-                        </div>
+                  {/* Access Perks */}
+                  <div className="rounded-3xl border border-border/70 bg-card p-7 shadow-sm">
+                    <h3 className="flex items-center gap-2.5 text-base font-semibold text-foreground mb-4">
+                      <Trees className="w-4 h-4 text-primary" />
+                      <span>Inclusive Access & Privileges</span>
+                    </h3>
+                    <ul className="space-y-3">
+                      {selectedPackage.access.map((item) => (
+                        <li key={item} className="flex items-start gap-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                          <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                          <div className="space-y-2">
-                            <Label className="text-white/80">Full Name</Label>
-                            <Input required value={formData.participant_name} onChange={e => setFormData({ ...formData, participant_name: e.target.value })} className="border-white/20 bg-white/10 text-white placeholder:text-white/50" />
-                          </div>
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label className="text-white/80">Email</Label>
-                              <Input type="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="border-white/20 bg-white/10 text-white placeholder:text-white/50" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-white/80">Phone</Label>
-                              <Input required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="border-white/20 bg-white/10 text-white placeholder:text-white/50" />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label className="text-white/80">Package</Label>
-                              <Select value={formData.class_type} onValueChange={(value) => handlePackageSelect(value)} required>
-                                <SelectTrigger className="border-white/20 bg-white/10 text-white">
-                                  <SelectValue placeholder="Select package" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {packages.map((item) => (
-                                    <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-white/80">Date</Label>
-                              <Input type="date" required min={new Date().toISOString().split('T')[0]} value={formData.booking_date} onChange={e => setFormData({ ...formData, booking_date: e.target.value })} className="border-white/20 bg-white/10 text-white" />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label className="text-white/80">Preferred time</Label>
-                              <Input type="time" value={formData.booking_time} onChange={e => setFormData({ ...formData, booking_time: e.target.value })} className="border-white/20 bg-white/10 text-white" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-white/80">Guests</Label>
-                              <Input type="number" min="1" max={guestLimit} value={formData.participants_count} onChange={e => setFormData({ ...formData, participants_count: e.target.value })} className="border-white/20 bg-white/10 text-white" />
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <Label className="text-white/80">Special requests</Label>
-                            <Textarea value={formData.special_requests} onChange={e => setFormData({ ...formData, special_requests: e.target.value })} className="border-white/20 bg-white/10 text-white placeholder:text-white/50" rows={4} placeholder="Tell us how you want the experience to feel." />
-                          </div>
-                          <TurnstileField
-                            onVerify={setCaptchaToken}
-                            onError={(message) => toast.error(message)}
-                            resetSignal={captchaResetCount}
-                            className="pt-2"
+                  {/* Curated Dining & Refreshments */}
+                  <div className="rounded-3xl border border-border/70 bg-card p-7 shadow-sm">
+                    <h3 className="flex items-center gap-2.5 text-base font-semibold text-foreground mb-4">
+                      <Coffee className="w-4 h-4 text-[#A56A2D]" />
+                      <span>Curated Refreshments & Menu</span>
+                    </h3>
+                    <ul className="space-y-3">
+                      {selectedPackage.menu.map((item) => (
+                        <li key={item} className="flex items-start gap-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#A56A2D] shrink-0 mt-2" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Right Column: The Reservation Form Card — Clean, spacious, NO overlapping */}
+                <div className="lg:col-span-7">
+                  <div className="rounded-3xl border border-border/80 bg-card p-7 sm:p-9 md:p-10 shadow-lg shadow-black/[0.03]">
+                    <div className="mb-8">
+                      <span className="text-xs font-semibold uppercase tracking-widest text-primary">
+                        Direct Reservation
+                      </span>
+                      <h3 className="heading-font text-2xl sm:text-3xl font-bold text-foreground mt-1">
+                        Book Your Experience
+                      </h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+                        Complete your details below. Our team at Peace Royal Resort will prepare everything prior to your arrival.
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      {/* Full Name */}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="participant_name" className="text-xs font-medium text-foreground">
+                          Full Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="participant_name"
+                          required
+                          value={formData.participant_name}
+                          onChange={(e) => setFormData({ ...formData, participant_name: e.target.value })}
+                          placeholder="e.g. David Okpo"
+                          className="h-11 bg-background text-foreground"
+                        />
+                      </div>
+
+                      {/* Contact row: Email & Phone */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5 min-w-0">
+                          <Label htmlFor="email" className="text-xs font-medium text-foreground">
+                            Email Address <span className="text-destructive">*</span>
+                          </Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            required
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            placeholder="guest@example.com"
+                            className="h-11 bg-background text-foreground"
                           />
-                          <div className="grid gap-3">
-                            <Button
-                              type="submit"
-                              name="submission_action"
-                              value="reserve"
-                              disabled={loading}
-                              onClick={() => setSubmitMode('reserve')}
-                              className="h-12 w-full rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                            >
-                              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Book Now'}
-                            </Button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 rounded-[2rem] bg-[#F7F3EA] p-7">
-                      <h4 className="flex items-center gap-2 text-lg font-semibold text-[#2F3A2F]">
-                        <CheckCircle2 className="h-5 w-5 text-[#58705B]" /> Package description
-                      </h4>
-                      <p className="mt-4 max-w-4xl text-base leading-8 text-[#566156]">{selectedPackage.description}</p>
-                    </div>
-
-                    <div className="mt-6 grid gap-6 xl:grid-cols-2">
-                      <div className="rounded-[2rem] bg-[#EEF2E6] p-6">
-                        <h4 className="flex items-center gap-2 text-lg font-semibold text-[#2F3A2F]">
-                          <Trees className="h-5 w-5 text-[#58705B]" /> Access
-                        </h4>
-                        <ul className="mt-4 space-y-3 text-sm leading-7 text-[#495649]">
-                          {selectedPackage.access.map((item) => (
-                            <li key={item} className="flex gap-3">
-                              <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[#58705B]"></span>
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
+                        </div>
+                        <div className="space-y-1.5 min-w-0">
+                          <Label htmlFor="phone" className="text-xs font-medium text-foreground">
+                            Phone Number <span className="text-destructive">*</span>
+                          </Label>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            required
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            placeholder="+234 800 000 0000"
+                            className="h-11 bg-background text-foreground"
+                          />
+                        </div>
                       </div>
 
-                      <div className="rounded-[2rem] bg-[#FFF4DD] p-6">
-                        <h4 className="flex items-center gap-2 text-lg font-semibold text-[#2F3A2F]">
-                          <Coffee className="h-5 w-5 text-[#A56A2D]" /> Menu
-                        </h4>
-                        <ul className="mt-4 space-y-3 text-sm leading-7 text-[#5F533F]">
-                          {selectedPackage.menu.map((item) => (
-                            <li key={item} className="flex gap-3">
-                              <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[#D3943A]"></span>
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
+                      {/* Package Selection & Booking Date */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5 min-w-0">
+                          <Label htmlFor="class_type" className="text-xs font-medium text-foreground">
+                            Chosen Package
+                          </Label>
+                          <Select
+                            value={formData.class_type}
+                            onValueChange={(val) => handlePackageSelect(val)}
+                          >
+                            <SelectTrigger id="class_type" className="h-11 bg-background text-foreground">
+                              <SelectValue placeholder="Select package" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {packages.map((pkg) => (
+                                <SelectItem key={pkg.id} value={pkg.id}>
+                                  {pkg.name} (₦{pkg.price.toLocaleString()})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1.5 min-w-0">
+                          <Label htmlFor="booking_date" className="text-xs font-medium text-foreground">
+                            Preferred Date <span className="text-destructive">*</span>
+                          </Label>
+                          <Input
+                            id="booking_date"
+                            type="date"
+                            required
+                            min={new Date().toISOString().split('T')[0]}
+                            value={formData.booking_date}
+                            onChange={(e) => setFormData({ ...formData, booking_date: e.target.value })}
+                            className="h-11 bg-background text-foreground cursor-pointer"
+                          />
+                        </div>
                       </div>
-                    </div>
+
+                      {/* Preferred Time & Guest Count */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5 min-w-0">
+                          <Label htmlFor="booking_time" className="text-xs font-medium text-foreground">
+                            Arrival Time
+                          </Label>
+                          <Input
+                            id="booking_time"
+                            type="time"
+                            value={formData.booking_time}
+                            onChange={(e) => setFormData({ ...formData, booking_time: e.target.value })}
+                            className="h-11 bg-background text-foreground cursor-pointer"
+                          />
+                        </div>
+                        <div className="space-y-1.5 min-w-0">
+                          <Label htmlFor="participants_count" className="text-xs font-medium text-foreground">
+                            Number of Guests {selectedPackage.maxGuests ? `(max ${selectedPackage.maxGuests})` : ''}
+                          </Label>
+                          <Input
+                            id="participants_count"
+                            type="number"
+                            min="1"
+                            max={guestLimit}
+                            value={formData.participants_count}
+                            onChange={(e) => setFormData({ ...formData, participants_count: e.target.value })}
+                            className="h-11 bg-background text-foreground"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Special Requests */}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="special_requests" className="text-xs font-medium text-foreground">
+                          Special Requests & Notes (Optional)
+                        </Label>
+                        <Textarea
+                          id="special_requests"
+                          value={formData.special_requests}
+                          onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
+                          rows={3}
+                          placeholder="Dietary requirements, preferred stretching hours, celebration notes, etc."
+                          className="bg-background text-foreground resize-none"
+                        />
+                      </div>
+
+                      {/* Price Calculation Pill */}
+                      <div className="p-4 rounded-2xl bg-muted/60 border border-border/70 flex items-center justify-between">
+                        <div>
+                          <span className="text-xs text-muted-foreground block">Estimated Total</span>
+                          <span className="text-xs font-medium text-foreground">
+                            {selectedPackage.name} &times; {formData.participants_count || 1} {Number(formData.participants_count) === 1 ? 'guest' : 'guests'}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-primary tabular-nums">
+                            ₦{totalPrice.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      <TurnstileField
+                        onVerify={setCaptchaToken}
+                        onError={(message) => toast.error(message)}
+                        resetSignal={captchaResetCount}
+                        className="pt-1"
+                      />
+
+                      {/* Submission Buttons */}
+                      <div className="pt-2">
+                        <Button
+                          type="submit"
+                          name="submission_action"
+                          value="reserve"
+                          disabled={loading}
+                          onClick={() => setSubmitMode('reserve')}
+                          className="h-12 w-full rounded-2xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 shadow-md transition-all active:scale-[0.99]"
+                        >
+                          {loading ? (
+                            <span className="inline-flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <span>Processing Reservation...</span>
+                            </span>
+                          ) : (
+                            <span>Reserve {selectedPackage.name} &rarr;</span>
+                          )}
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-2">
+                        <ShieldCheck className="w-4 h-4 text-primary" />
+                        <span>Instant notification &middot; No booking fee required upfront</span>
+                      </div>
+                    </form>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </section>
         </main>
+
         <Footer />
       </div>
     </>

@@ -112,8 +112,6 @@ const GardenBookingPage = () => {
     media: [
       { src: HOTEL_IMAGES.gardenBookingNight, alt: 'Nighttime garden booking view' },
       { src: '/assets/images/garden-booking-night.mp4', alt: 'Night garden cinema experience', startAt: 10, endAt: 20 },
-      { src: '/assets/images/garden-filmshow.mp4', alt: 'Outdoor film show in the garden', startAt: 10, endAt: 20 },
-      { src: '/assets/images/garden-events.mp4', alt: 'Evening garden event setup', startAt: 10, endAt: 20 },
     ],
     text: 'text-foreground'
   } : {
@@ -122,8 +120,6 @@ const GardenBookingPage = () => {
     media: [
       { src: HOTEL_IMAGES.gardenDay, alt: 'Garden daytime photo' },
       { src: HOTEL_IMAGES.gardenBookingDay, alt: 'Garden day booking view' },
-            { src: '/assets/images/garden-games.mp4', alt: 'Garden games and hangout moment', startAt: 10, endAt: 20 },
-      { src: '/assets/images/garden-events.mp4', alt: 'Garden event in daylight', startAt: 10, endAt: 20 },
     ],
     text: 'text-foreground'
   };
@@ -132,20 +128,6 @@ const GardenBookingPage = () => {
     {
       src: '/assets/images/garden-event-valentine1.jpg',
       alt: 'Valentine garden event decor and guest setup',
-    },
-    {
-      src: '/assets/images/garden-event-valentine2.mp4',
-      alt: 'Valentine garden event highlight video',
-      startAt: 0,
-      endAt: 14,
-      poster: '/assets/images/garden-event-valentine1.jpg',
-    },
-    {
-      src: '/assets/images/garden-event-valentine-3.mp4',
-      alt: 'Valentine evening garden celebration video',
-      startAt: 0,
-      endAt: 12,
-      poster: '/assets/images/garden-event-valentine1.jpg',
     },
   ];
 
