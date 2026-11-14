@@ -12,7 +12,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
-import MediaSlideshow from '@/components/MediaSlideshow.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
@@ -109,27 +108,12 @@ const GardenBookingPage = () => {
   const activeContent = isNightMode ? {
     title: 'Spice & Cinema',
     desc: 'Pepper soup, outdoor movie nights under the stars.',
-    media: [
-      { src: HOTEL_IMAGES.gardenBookingNight, alt: 'Nighttime garden booking view' },
-      { src: '/assets/images/garden-booking-night.mp4', alt: 'Night garden cinema experience', startAt: 10, endAt: 20 },
-    ],
     text: 'text-foreground'
   } : {
     title: 'Deck & Dawn',
     desc: 'Card games, breakfast, and skyline views.',
-    media: [
-      { src: HOTEL_IMAGES.gardenDay, alt: 'Garden daytime photo' },
-      { src: HOTEL_IMAGES.gardenBookingDay, alt: 'Garden day booking view' },
-    ],
     text: 'text-foreground'
   };
-
-  const valentineEventMedia = [
-    {
-      src: '/assets/images/garden-event-valentine1.jpg',
-      alt: 'Valentine garden event decor and guest setup',
-    },
-  ];
 
   return (
     <>
@@ -152,16 +136,31 @@ const GardenBookingPage = () => {
                   initial={{ opacity: 0, scale: 1.02 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8 }}
+                  transition={{ duration: 0.45, ease: 'easeOut' }}
                   className="absolute inset-0"
                 >
-                  <MediaSlideshow
-                    items={activeContent.media}
-                    className="h-full w-full"
-                    overlayClassName="bg-black/40"
-                    imageLoading="eager"
-                    imageFetchPriority="high"
-                  />
+                  {isNightMode ? (
+                    <video
+                      src="/assets/images/garden-booking-night.mp4"
+                      poster={HOTEL_IMAGES.gardenDay}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={HOTEL_IMAGES.gardenDay}
+                      alt="Garden daytime view"
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-black/40" />
                 </motion.div>
               </AnimatePresence>
               <div className="absolute top-6 right-6 z-20 flex bg-white/20 backdrop-blur-md p-1 rounded-full border border-white/30">
@@ -284,23 +283,36 @@ const GardenBookingPage = () => {
             </div>
 
             <div className="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl min-h-[24rem]">
-                <MediaSlideshow
-                  items={valentineEventMedia}
-                  className="h-full min-h-[24rem] w-full"
-                  overlayClassName="bg-black/20"
-                  activateWhenInView
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '100px' }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+                className="relative overflow-hidden rounded-[2.5rem] shadow-2xl h-[24rem] group"
+              >
+                <img
+                  src="/assets/images/garden-event-valentine1.jpg"
+                  alt="Valentine garden event decor and guest setup"
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+              </motion.div>
 
-              <div className={activeContent.text}>
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '100px' }}
+                transition={{ duration: 0.45, delay: 0.1, ease: 'easeOut' }}
+                className={activeContent.text}
+              >
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border mb-6 font-semibold uppercase tracking-wider text-sm">
-                  <Sparkles className="w-4 h-4" /> Event Highlights
+                  <Sparkles className="w-4 h-4 text-primary" /> Event Highlights
                 </div>
                 <h3 className="heading-font text-4xl md:text-5xl font-bold mb-6">Valentine Garden Moments</h3>
                 <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                  These new garden event visuals now sit directly on the booking page so guests can see the atmosphere before they book.
-                  The section leans into styled celebrations, intimate evening setups, and the kind of private event energy the space can carry well.
+                  Designed for milestone celebrations, intimate evening setups, and private twilight gatherings surrounded by warm ambient lighting and open-air comfort.
                 </p>
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="rounded-2xl border border-border bg-card p-4">
@@ -309,14 +321,14 @@ const GardenBookingPage = () => {
                   </div>
                   <div className="rounded-2xl border border-border bg-card p-4">
                     <div className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">Format</div>
-                    <div className="font-semibold">Photo + video story</div>
+                    <div className="font-semibold">Curated décor</div>
                   </div>
                   <div className="rounded-2xl border border-border bg-card p-4">
                     <div className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">Best For</div>
                     <div className="font-semibold">Private celebrations</div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
           </div>

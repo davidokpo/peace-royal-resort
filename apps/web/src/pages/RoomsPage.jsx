@@ -11,7 +11,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import Footer from '@/components/Footer.jsx';
-import MediaSlideshow from '@/components/MediaSlideshow.jsx';
 import SidebarNavigation from '@/components/SidebarNavigation.jsx';
 import TurnstileField, { isTurnstileEnabled } from '@/components/TurnstileField.jsx';
 import { HOTEL_IMAGES } from '@/config/siteContent.js';
@@ -190,15 +189,21 @@ const RoomsPage = () => {
               {rooms.map((room, idx) => (
                 <motion.div
                   key={room.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                  className={`flex flex-col ${idx % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row'} gap-8 bg-card/60 backdrop-blur-xl border border-white/40 rounded-3xl overflow-hidden shadow-lg`}
+                  viewport={{ once: true, margin: '100px' }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
+                  className={`group flex flex-col ${idx % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row'} gap-8 bg-card/70 backdrop-blur-xl border border-border/60 rounded-3xl overflow-hidden shadow-lg`}
                 >
-                  <div className="md:w-1/2 h-64 md:h-auto relative">
-                    <MediaSlideshow items={room.media} className="h-full w-full" />
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-primary shadow-sm">
+                  <div className="md:w-1/2 h-64 md:h-auto relative overflow-hidden">
+                    <img
+                      src={room.image}
+                      alt={room.name}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                    <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-primary shadow-sm">
                       ₦{room.price.toLocaleString()} / night
                     </div>
                   </div>

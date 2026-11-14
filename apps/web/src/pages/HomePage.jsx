@@ -21,7 +21,7 @@ const HomePage = () => {
       title: 'Sanctuary Rooms',
       desc: 'Minimalist restraint, premium linens, and quiet comfort.',
       link: '/rooms',
-      badge: 'From ₦50,000/night',
+      badge: 'From ₦25,000/night',
       image: HOTEL_IMAGES.roomExecutive
     },
     {
